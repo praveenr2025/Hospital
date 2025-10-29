@@ -7,7 +7,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 const app = express();
 
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "https://bankreconn.centralindia.cloudapp.azure.com", credentials: true }));
 app.use(express.json());
 app.use(morgan("dev"));
 
