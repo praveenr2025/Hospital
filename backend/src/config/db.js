@@ -4,32 +4,44 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import dotenv from 'dotenv';
 
-// Load environment variables from .env file
-dotenv.config(); 
+dotenv.config();
 
-// Configuration object for the PostgreSQL connection
+const isProduction = process.env.NODE_ENV === 'production';
+
+// ✅ PostgreSQL connection pool configuration
 const config = {
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASS,
-  // Ensure the port is parsed as an integer
-  port: parseInt(process.env.DB_PORT, 10), 
+  port: parseInt(process.env.DB_PORT, 10),
+
+  // Pool tuning
+  max: 20,                 // max number of clients in the pool
+  idleTimeoutMillis: 30000, // close idle clients after 30s
+  connectionTimeoutMillis: 5000, // timeout after 5s if connection fails
+
+  // SSL only in production
+  ssl: isProduction
+    ? { rejectUnauthorized: false } // allows SSL without verifying CA (since you’re local)
+    : false,
 };
 
-// Create the connection pool
 const pool = new Pool(config);
 
-// Log successful connection
-pool.on('connect', () => {
-  console.log('✅ Connected to PostgreSQL');
-});
-
-// Handle connection errors
+// Connection event listeners
+pool.on('connect', () => console.log('✅ Connected to PostgreSQL'));
+pool.on('remove', () => console.log('⚙️  Client removed from pool'));
 pool.on('error', (err) => {
-    console.error('❌ Unexpected error on idle client', err);
-    process.exit(-1); // Exit the process if a critical error occurs
+  console.error('❌ Unexpected error on idle client:', err.message);
 });
 
-// Export the pool so other files (like dbService.js) can run queries
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('🧹 Closing PostgreSQL pool...');
+  await pool.end();
+  console.log('✅ Pool closed. Exiting.');
+  process.exit(0);
+});
+
 export default pool;
