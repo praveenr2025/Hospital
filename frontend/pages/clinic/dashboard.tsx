@@ -110,7 +110,7 @@ export default function ClinicDashboard() {
     <>
       <Header />
       <div className="body">
-        <h1 className="h1">Clinic Dashboard</h1>
+        <h2>Clinic Dashboard</h2>
 
         {loading ? (
           <p>Loading dashboard...</p>
@@ -121,7 +121,7 @@ export default function ClinicDashboard() {
           <>
           
             <div className="kpis"
-            style={{ maxWidth: "2480px", margin: "16px auto" }}
+            style={{ maxWidth: "1280px", margin: "16px auto" }}
             >
               {kpis.map((kpi, idx) => (
                
@@ -133,7 +133,7 @@ export default function ClinicDashboard() {
             </div>
 
             <div className="grid"
-            style={{ maxWidth: "2480px", margin: "16px auto" }}>
+            style={{ maxWidth: "1280px", margin: "16px auto" }}>
               {/* Appointments Card (takes 8 of 12 columns) */}
               <div className="card cols-2">
                 <h3>Today's Appointments</h3>
