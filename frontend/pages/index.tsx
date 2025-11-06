@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import styles from "@/styles/Login.module.css";
+import styles from "@/styles/Auth.module.css";
 import axios from "axios"; // IMPORTANT: Install 'axios' for API calls
 
 // Base URL for your backend API
@@ -89,85 +89,82 @@ export default function LoginPage() {
 
   const handleSubmit = isLogin ? handleLogin : handleRegister;
 
-  return (
-    <div className={styles.page}>
-      <div className={styles.loginContainer}>
-        <div className={styles.logo}>🏥</div>
-        <h1>{isLogin ? "Welcome Back" : "Register New Staff"}</h1>
-        <p className={styles.sub}>
-          {isLogin ? "Log in to access your Portal" : "Sign up for a new account"}
-        </p>
+ return (
+  <div className={styles["auth-page"]}>
+    <div className={styles["auth-container"]}>
+      <div className={styles["auth-logo"]}>🏥</div>
+      <h1 className={styles["auth-title"]}>
+        {isLogin ? "Welcome Back" : "Register New Staff"}
+      </h1>
+      <p className={styles["auth-sub"]}>
+        {isLogin ? "Log in to access your Portal" : "Sign up for a new account"}
+      </p>
 
-        {error && <div className={styles.errorMessage}>{error}</div>}
+      {error && <div className={styles["auth-error"]}>{error}</div>}
 
-        <form onSubmit={handleSubmit}>
-          {/* Full Name for Signup */}
-          {!isLogin && (
-            <div className={styles.formGroup}>
-              <label>Full Name</label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required={!isLogin}
-              />
-            </div>
-          )}
+      <form onSubmit={handleSubmit}>
+        {!isLogin && (
+          <div className={styles["auth-form-group"]}>
+            <label>Full Name</label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required={!isLogin}
+            />
+          </div>
+        )}
 
-          {/* Email */}
-          <div className={styles.formGroup}>
-            <label>Email Address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        <div className={styles["auth-form-group"]}>
+          <label>Email Address</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
 
-          {/* Password */}
-          <div className={styles.formGroup}>
-            <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+        <div className={styles["auth-form-group"]}>
+          <label>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
 
-          {/* Role Dropdown for Signup */}
-          {!isLogin && (
-            <div className={styles.formGroup}>
-              <label>Select Your Role</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                required={!isLogin}
-                className={styles.selectInput}
-              >
-                {/* --- ADMIN ROLE ADDED FOR TESTING --- */}
-                <option value="admin">Admin</option>
-                {/* ------------------------------------ */}
-                <option value="doctor">Doctor</option>
-                <option value="nurse">Nurse</option>
-                <option value="receptionist">Receptionist</option>
-              </select>
-            </div>
-          )}
+        {!isLogin && (
+          <div className={styles["auth-form-group"]}>
+            <label>Select Your Role</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required={!isLogin}
+            >
+              <option value="admin">Admin</option>
+              <option value="doctor">Doctor</option>
+              <option value="nurse">Nurse</option>
+              <option value="receptionist">Receptionist</option>
+            </select>
+          </div>
+        )}
 
-          <div className={styles.formLinks}>
-            <a href="#">Forgot Password?</a>
-            <a href="#" onClick={() => setIsLogin(!isLogin)} role="button">
-              {isLogin ? "Need an Account? Sign Up" : "Already have an account? Sign In"}
-            </a>
-          </div>
+        <div className={styles["auth-links"]}>
+          <a href="#">Forgot Password?</a>
+          <a href="#" onClick={() => setIsLogin(!isLogin)} role="button">
+            {isLogin
+              ? "Need an Account? Sign Up"
+              : "Already have an account? Sign In"}
+          </a>
+        </div>
 
-          <button className={styles.btn} type="submit" disabled={loading}>
-            {loading ? "Processing..." : isLogin ? "Sign In" : "Register"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+        <button className={styles["auth-btn"]} type="submit" disabled={loading}>
+          {loading ? "Processing..." : isLogin ? "Sign In" : "Register"}
+        </button>
+      </form>
+    </div>
+  </div>
+);
 }
