@@ -114,7 +114,7 @@ export default function UsersPage() {
       <main className="body">
       <div className="page active container">
         <div className="card"
-        tyle={{ maxWidth: "2280px", margin: "16px auto" }}>
+        tyle={{ maxWidth: "1280px", margin: "16px auto" }}>
           <div className="row" style={{ alignItems: "center", marginBottom: 20 }}>
             <h2>User Account Management</h2>
             <input
