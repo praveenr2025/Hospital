@@ -191,7 +191,7 @@ export default function RosterPage() {
       <main className="body">
       <div className="page active container">
         <div className="card">
-          <div className="row" style={{ maxWidth: "1580px", margin: "16px auto" }}>
+          <div className="row" style={{ maxWidth: "1280px", margin: "16px auto" }}>
             <h2>Weekly Roster</h2>
             <input
               type="date"
