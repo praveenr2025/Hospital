@@ -14,8 +14,8 @@ export default function ReferralsPage() {
     const fetchData = async () => {
       try {
         const [patientsRes, referralsRes] = await Promise.all([
-          fetch("http://localhost:5000/api/clinic/patients"),
-          fetch("http://localhost:5000/api/clinic/referrals"),
+          fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients"),
+          fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/referrals"),
         ]);
         setPatients(await patientsRes.json());
         setReferrals(await referralsRes.json());
@@ -37,7 +37,7 @@ export default function ReferralsPage() {
       return alert("Please fill all required fields.");
 
     try {
-      const res = await fetch("http://localhost:5000/api/clinic/referrals", {
+      const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/referrals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ patientId, direction, provider, reason }),
