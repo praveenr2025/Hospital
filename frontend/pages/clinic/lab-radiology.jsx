@@ -22,8 +22,8 @@ export default function LabRadiologyPage() {
     const fetchData = async () => {
       try {
         const [patientsRes, labsRes] = await Promise.all([
-          fetch("http://localhost:5000/api/clinic/patients"),
-          fetch("http://localhost:5000/api/clinic/lab-orders"),
+          fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients"),
+          fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/lab-orders"),
         ]);
         setPatients(await patientsRes.json());
         setLabOrders(await labsRes.json());
@@ -54,7 +54,7 @@ export default function LabRadiologyPage() {
     if (!patientId || !testName) return alert("Please fill all required fields.");
 
     try {
-      const res = await fetch("http://localhost:5000/api/clinic/lab-orders", {
+      const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/lab-orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ patientId, testName, testType, clinicalNotes }),
