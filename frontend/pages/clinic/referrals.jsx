@@ -60,7 +60,7 @@ export default function ReferralsPage() {
       <Header />
        <main className="body">
         <div className="card referrals-card"
-         style={{ maxWidth: "1580px", margin: "16px auto" }}>
+         style={{ maxWidth: "1280px", margin: "16px auto" }}>
           <div className="card-header">
             <h2>Referral Management</h2>
             <div className="actions">
