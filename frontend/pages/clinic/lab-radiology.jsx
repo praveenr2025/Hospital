@@ -78,7 +78,7 @@ export default function LabRadiologyPage() {
       <main className="body">
         {/* === Lab & Radiology Orders Card === */}
         <div className="card-container"
-       style={{ maxWidth: "1580px", margin: "16px auto" }}>
+       style={{ maxWidth: "1280px", margin: "16px auto" }}>
           <div className="card-header">
             <h2>Lab & Radiology Orders</h2>
             <div className="right-controls">
