@@ -200,7 +200,7 @@ export default function PatientsPage() {
         {/* Use .card class, add inline styles for max-width and margin */}
         <div
           className="card"
-          style={{ maxWidth: "1580px", margin: "16px auto" }}
+          style={{ maxWidth: "1280px", margin: "16px auto" }}
         >
           {/* Use .row class, add inline style for alignment and margin */}
           <div
