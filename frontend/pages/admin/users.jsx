@@ -22,7 +22,7 @@ export default function UsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/staff");
+        const res = await axios.get("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff");
         const mappedUsers = res.data.map((u) => ({
           ...u,
           loginStatus: u.status, // map status column to loginStatus
@@ -52,7 +52,7 @@ export default function UsersPage() {
 
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/admin/staff/${activeUser.id}`,
+        `https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff/${activeUser.id}`,
         {
           fullName: activeUser.full_name || activeUser.name,
           role: updatedRole,
@@ -83,7 +83,7 @@ export default function UsersPage() {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/admin/staff/${id}`);
+      await axios.delete(`https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff/${id}`);
       setUsers((prev) => prev.filter((u) => u.id !== id));
     } catch (err) {
       console.error("Error deleting user:", err);
