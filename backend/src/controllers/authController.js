@@ -94,17 +94,31 @@ export const login = async (req, res) => {
 
 // --- Get Current User ---
 export const getCurrentUser = async (req, res) => {
-    // req.user is set by authMiddleware.js
-    const user = await db.findUserById(req.user.id);
-    
-    if (user) {
-        res.json({
-            id: user.user_id,
-            email: user.email,
-            role: user.role,
-            full_name: user.full_name,
-        });
-    } else {
-        res.status(404).json({ message: 'User not found.' });
+  try {
+    if (!req.user || !req.user.id) {
+      console.error("❌ No user decoded from token");
+      return res.status(401).json({ message: "Not authorized, token missing or invalid." });
     }
+
+    const user = await db.findUserById(req.user.id);
+
+    if (!user) {
+      console.error(`❌ No user found in DB for ID: ${req.user.id}`);
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    console.log(`✅ User fetched: ${user.full_name} (${user.role})`);
+
+    res.json({
+      user: {
+        id: user.user_id,
+        email: user.email,
+        role: user.role,
+        full_name: user.full_name,
+      },
+    });
+  } catch (error) {
+    console.error("Error in getCurrentUser:", error);
+    res.status(500).json({ message: "Server error while fetching user." });
+  }
 };
