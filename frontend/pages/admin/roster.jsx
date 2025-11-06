@@ -68,8 +68,8 @@ export default function RosterPage() {
     const fetchData = async () => {
       try {
         const [staffRes, rosterRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/admin/staff"),
-          axios.get("http://localhost:5000/api/admin/roster"),
+          axios.get("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff"),
+          axios.get("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/roster"),
         ]);
 
         const staffList = staffRes.data.map((s) => ({
@@ -131,7 +131,7 @@ export default function RosterPage() {
 
     // 1. Send to backend
     axios
-      .post("http://localhost:5000/api/admin/roster", {
+      .post("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/roster", {
         staffId: staffId,
         weekStart,
         shifts: updatedShifts,
