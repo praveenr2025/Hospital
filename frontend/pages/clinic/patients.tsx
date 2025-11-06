@@ -74,7 +74,7 @@ export default function PatientsPage() {
       try {
         setLoading(true);
         setError("");
-        const res = await fetch("http://localhost:5000/api/clinic/patients");
+        const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients");
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
 
@@ -125,7 +125,7 @@ export default function PatientsPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/clinic/patients", {
+      const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
