@@ -23,8 +23,8 @@ export default function InventoryPage() {
       try {
         setLoading(true);
         const [inventoryRes, vaccinesRes] = await Promise.all([
-          fetch("http://localhost:5000/api/clinic/inventory"),
-          fetch("http://localhost:5000/api/clinic/vaccines"),
+          fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/inventory"),
+          fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/vaccines"),
         ]);
 
         if (!inventoryRes.ok) throw new Error("Failed to fetch inventory");
@@ -51,7 +51,7 @@ export default function InventoryPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/clinic/inventory", {
+      const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/inventory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ vaccineId, batchNumber, expiryDate, quantity }),
