@@ -40,7 +40,7 @@ export default function AdminStaff() {
 
   // Load all staff on mount
   useEffect(() => {
-    fetch("http://localhost:5000/api/admin/staff")
+    fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff")
       .then((res) => res.json())
       .then((data) => setStaffList(data))
       .catch((err) => console.error("Error fetching staff:", err));
@@ -87,8 +87,8 @@ export default function AdminStaff() {
     const isEditing = !!editingStaff;
     
     const url = isEditing
-      ? `http://localhost:5000/api/admin/staff/${editingStaff.id}`
-      : "http://localhost:5000/api/admin/staff";
+      ? `https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff/${editingStaff.id}`
+      : "https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff";
       
     const method = isEditing ? "PUT" : "POST";
 
@@ -137,7 +137,7 @@ const payload = {
 
     try {
         // Send the full staff object with the new status
-        await fetch(`http://localhost:5000/api/admin/staff/${staff.id}`, {
+        await fetch(`https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff/${staff.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...staff, full_name: staff.full_name, status: newStatus })
