@@ -61,17 +61,17 @@ const [
         referrals,
         lowStock, // <-- Add this variable
       ] = await Promise.all([
-        fetchJSON("http://localhost:5000/api/admin/staff"),
-        fetchJSON("http://localhost:5000/api/admin/roster/today"),
-        fetchJSON("http://localhost:5000/api/clinic/appointments/today"),
+        fetchJSON("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff"),
+        fetchJSON("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/roster/today"),
+        fetchJSON("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/appointments/today"),
         fetchJSON(
-          "http://localhost:5000/api/clinic/invoices?status=Pending"
+          "https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/invoices?status=Pending"
         ),
         fetchJSON(
-          "http://localhost:5000/api/clinic/lab-orders?status=Pending"
+          "https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/lab-orders?status=Pending"
         ),
-        fetchJSON("http://localhost:5000/api/clinic/referrals?status=Sent"),
-        fetchJSON("http://localhost:5000/api/admin/inventory/low-stock"), // <-- Add this API call
+        fetchJSON("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/referrals?status=Sent"),
+        fetchJSON("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/inventory/low-stock"), // <-- Add this API call
       ]);
       // Update KPIs
       setKpis({
