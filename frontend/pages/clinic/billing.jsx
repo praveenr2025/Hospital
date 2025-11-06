@@ -17,7 +17,7 @@ export default function BillingPage() {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/clinic/patients");
+        const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients");
         const data = await res.json();
         setPatients(data);
       } catch (err) {
@@ -31,7 +31,7 @@ export default function BillingPage() {
   useEffect(() => {
     const fetchBillingCodes = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/admin/billing");
+        const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/billing");
         const data = await res.json();
         setBillingCodes(data);
       } catch (err) {
@@ -45,7 +45,7 @@ export default function BillingPage() {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/clinic/invoices");
+        const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/invoices");
         const data = await res.json();
         setInvoices(data);
       } catch (err) {
@@ -92,7 +92,7 @@ export default function BillingPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/clinic/invoices", {
+      const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/invoices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ patientId, invoiceDate, items: invoiceItems, status })
