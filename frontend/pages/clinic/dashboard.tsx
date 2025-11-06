@@ -106,25 +106,28 @@ export default function ClinicDashboard() {
     loadDashboardData();
   }, []);
 
-  return (
-    <>
-      <Header />
-      <div className="body">
-        <h2>Clinic Dashboard</h2>
+return (
+  <>
+    <Header />
+
+    <main className="clinic-dashboard">
+      <div className="container">
+        <div className="dashboard-header">
+          <h2 className="dashboard-title"> Clinic Dashboard</h2>
+          <p className="dashboard-sub">Overview of today’s activity</p>
+        </div>
 
         {loading ? (
           <p>Loading dashboard...</p>
         ) : error ? (
-
           <p>{error}</p>
         ) : (
           <>
-          
-            <div className="kpis"
-            style={{ maxWidth: "1280px", margin: "16px auto" }}
+            <div
+              className="kpis"
+              style={{ maxWidth: "1280px", margin: "16px auto" }}
             >
               {kpis.map((kpi, idx) => (
-               
                 <div key={idx} className="kpi">
                   <h3>{kpi.title}</h3>
                   <span className="v">{kpi.value}</span>
@@ -132,9 +135,11 @@ export default function ClinicDashboard() {
               ))}
             </div>
 
-            <div className="grid"
-            style={{ maxWidth: "1280px", margin: "16px auto" }}>
-              {/* Appointments Card (takes 8 of 12 columns) */}
+            <div
+              className="grid"
+              style={{ maxWidth: "1280px", margin: "16px auto" }}
+            >
+              {/* Appointments Card */}
               <div className="card cols-2">
                 <h3>Today's Appointments</h3>
                 {appointments.length === 0 ? (
@@ -145,9 +150,6 @@ export default function ClinicDashboard() {
                       <li key={a.id} className="dashboard-item">
                         <span className="item-time">{a.time?.slice(0, 5)}</span>
                         <span className="item-name">{a.patientName}</span>
-                        {/* Note: Your data has 'doctorName', but the image shows a 'reason'.
-                          I am mapping 'doctorName' to this third slot.
-                        */}
                         <span className="item-reason">{a.doctorName}</span>
                       </li>
                     ))}
@@ -155,7 +157,7 @@ export default function ClinicDashboard() {
                 )}
               </div>
 
-              {/* Vaccinations Card (takes 4 of 12 columns) */}
+              {/* Vaccinations Card */}
               <div className="card cols-1">
                 <h3>Vaccinations Due Soon</h3>
                 {vaccinations.length === 0 ? (
@@ -165,9 +167,6 @@ export default function ClinicDashboard() {
                     {vaccinations.map((v) => (
                       <li key={v.id} className="dashboard-item">
                         <span className="item-name">{v.patientName}</span>
-                        {/* Combining vaccineName and dueDate to match the "MMR - 2" 
-                          style from your image.
-                        */}
                         <span className="item-reason">
                           {v.vaccineName} - {v.dueDate}
                         </span>
@@ -180,6 +179,7 @@ export default function ClinicDashboard() {
           </>
         )}
       </div>
-    </>
-  );
+    </main>
+  </>
+);
 }
