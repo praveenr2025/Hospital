@@ -51,9 +51,9 @@ export default function StaffProfilePage() {
       try {
         // Fetch staff details, their roster, and their notes in parallel
         const [staffRes, rosterRes, notesRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/admin/staff/${id}`),
-          axios.get("http://localhost:5000/api/admin/roster"), // Fetches all rosters
-          axios.get(`http://localhost:5000/api/admin/staff/${id}/notes`), // Assumes a notes endpoint
+          axios.get(`https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff/${id}`),
+          axios.get("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/roster"), // Fetches all rosters
+          axios.get(`https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff/${id}/notes`), // Assumes a notes endpoint
         ]);
 
         // Set Staff Details
@@ -93,7 +93,7 @@ export default function StaffProfilePage() {
     try {
       // POST to backend
       const res = await axios.post(
-        `http://localhost:5000/api/admin/staff/${id}/notes`,
+        `https://bankreconn.centralindia.cloudapp.azure.com/api/admin/staff/${id}/notes`,
         noteObj
       );
 
