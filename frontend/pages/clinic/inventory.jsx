@@ -98,7 +98,7 @@ export default function InventoryPage() {
         style={{ maxWidth: "1280px", margin: "16px auto" }}
         >
           <div className="card-header">
-            <h1>Vaccine Inventory Management</h1>
+            <h2>Vaccine Inventory Management</h2>
             <div className="right-controls">
               <input
                 type="text"
