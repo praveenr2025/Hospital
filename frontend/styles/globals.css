@@ -1,6 +1,6 @@
 
 :root{
-    --bg: #f7f9fc;
+    --bg: #f8fafc;
     --panel: #ffffff;
     --ink: #1e293b;
     --ink-soft:#475569;
@@ -20,11 +20,11 @@
     html,body{height:100%}
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-    Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-
+  background: var(--bg);
+font-family: 'Inter', sans-serif;
+scroll-behavior: smooth;
   line-height: 1.45;
-  font-size: 18px;
+  font-size: 14px;
   color: var(--ink); /* Also good to set a default text color */
 }
 
@@ -90,7 +90,7 @@ header {
       background-color: var(--primary); /* Use your primary blue color */
       color: white; /* Make text white */
     }
-    .status-pill { padding: 4px 10px; border-radius: 999px; font-weight: 600; font-size: 18px; text-align: center; }
+    .status-pill { padding: 4px 10px; border-radius: 999px; font-weight: 600; font-size: 14px; text-align: center; }
     .status-pill.given { background-color: var(--ok); color: white; }
     .status-pill.due { background-color: var(--warn); color: white; }
     .status-pill.overdue { background-color: var(--bad); color: white; }
@@ -196,7 +196,7 @@ header {
     .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel); border-radius: var(--radius); box-shadow: 0 15px 40px rgba(2,6,23,.2); padding: 24px; width: 90%; max-width: 800px; z-index: 100; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .modal-header h2 { margin: 0; }
-    .modal-close { font-size: 24px; cursor: pointer; color: var(--ink-soft); border: none; background: none; }
+    .modal-close { font-size: 18px; cursor: pointer; color: var(--ink-soft); border: none; background: none; }
     .modal-body { max-height: 70vh; overflow-y: auto; padding-right: 10px; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -247,7 +247,7 @@ header {
 
     .prescription-view { border: 1px solid var(--muted); padding: 20px; font-family: 'Times New Roman', Times, serif; }
     .rx-header { text-align: center; margin-bottom: 20px; }
-    .rx-header h2 { font-size: 24px; margin: 0; color: var(--primary); }
+    .rx-header h2 { font-size: 18px; margin: 0; color: var(--primary); }
     .rx-details { display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px; font-size: 14px; }
     .rx-symbol { font-size: 40px; font-weight: bold; margin-bottom: 10px; }
     .rx-medication { margin-bottom: 15px; }
@@ -259,7 +259,7 @@ header {
     .timeline { list-style: none; padding: 0; margin-top: 16px; position: relative; }
     .timeline:before { content: ''; position: absolute; left: 18px; top: 0; bottom: 0; width: 2px; background: var(--muted); }
     .timeline-item { position: relative; padding: 12px 0 12px 48px; }
-    .timeline-icon { position: absolute; left: 0; top: 12px; width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 50%; display: grid; place-content: center; font-size: 18px; border: 4px solid var(--bg); }
+    .timeline-icon { position: absolute; left: 0; top: 12px; width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 50%; display: grid; place-content: center; font-size: 14px; border: 4px solid var(--bg); }
     .timeline-icon.ok { background: var(--ok); }
     .timeline-icon.warn { background: var(--warn); }
     .timeline-icon.accent { background: var(--accent); }
@@ -686,3 +686,5 @@ header {
 .cols-1 .dashboard-item .item-reason {
   margin-left: auto;
 }
+/* frontend/styles/Login.module.css */
+/* Center the login card */
