@@ -30,7 +30,7 @@ export default function SettingsPage() {
 
   const fetchBillingCodes = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/billing");
+      const res = await axios.get("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/billing");
       setBillingCodes(res.data);
     } catch (err) {
       console.error("Error loading billing codes:", err);
@@ -39,7 +39,7 @@ export default function SettingsPage() {
 
   const fetchLabTests = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/labs");
+      const res = await axios.get("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/labs");
       setLabTests(res.data);
     } catch (err) {
       console.error("Error loading lab tests:", err);
@@ -81,7 +81,7 @@ export default function SettingsPage() {
     const cost = parseFloat(form.elements["billing-cost"].value);
 
     try {
-      await axios.post("http://localhost:5000/api/admin/billing", {
+      await axios.post("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/billing", {
         id: activeBillingId,
         code,
         description,
@@ -102,7 +102,7 @@ export default function SettingsPage() {
     const type = form.elements["lab-test-type"].value;
 
     try {
-      await axios.post("http://localhost:5000/api/admin/labs", {
+      await axios.post("https://bankreconn.centralindia.cloudapp.azure.com/api/admin/labs", {
         id: activeLabId,
         name,
         type,
