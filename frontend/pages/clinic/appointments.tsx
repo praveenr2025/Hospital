@@ -148,7 +148,7 @@ useEffect(() => {
       
         {/* Header + Filters */}
         {/* Use .card class, add inline style for margin-bottom */}
-        <div className="card" style={{ maxWidth: "1780px", margin: "16px auto" }}>
+        <div className="card" style={{ maxWidth: "1280px", margin: "16px auto" }}>
                   {/* Use .row class, add inline style for alignment and margin */}
           <div
             className="row"
