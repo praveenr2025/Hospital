@@ -193,12 +193,12 @@ export default function PatientsPage() {
       <main className="body">
         {/* ================= ADD PATIENT MODAL ================= */}
           {modalOpen && (
-            <div className="modal-overlay">
-              <div className="modal-content">
-                <div className="modal-header">
+            <div className="appt-modal-overlay">
+              <div className="appt-modal-content">
+                <div className="appt-modal-header">
                   <h2>Register New Patient</h2>
                   <button
-                    className="modal-close"
+                    className="appt-modal-close"
                     onClick={() => setModalOpen(false)}
                     aria-label="Close"
                   >
@@ -206,7 +206,7 @@ export default function PatientsPage() {
                   </button>
                 </div>
 
-                <div className="modal-body">
+                <div className="appt-modal-body">
                   <form
                     onSubmit={async (e) => {
                       e.preventDefault();
@@ -663,16 +663,16 @@ export default function PatientsPage() {
 
                   {/* ================= ADD GROWTH MODAL ================= */}
                   {showGrowthModal && (
-                    <div className="modal-overlay">
-                      <div className="modal-content" style={{ maxWidth: "540px" }}>
-                        <div className="modal-header">
+                    <div className="appt-modal-overlay">
+                      <div className="appt-modal-content" style={{ maxWidth: "540px" }}>
+                        <div className="appt-modal-header">
                           <h2>Add Growth Record</h2>
-                          <button className="modal-close" onClick={() => setShowGrowthModal(false)}>
+                          <button className="appt-modal-close" onClick={() => setShowGrowthModal(false)}>
                             &times;
                           </button>
                         </div>
 
-                        <div className="modal-body">
+                        <div className="appt-modal-body">
                           <form
                             onSubmit={async (e) => {
                               e.preventDefault();
@@ -734,16 +734,16 @@ export default function PatientsPage() {
 
                   {/* ================= ADD VACCINATION MODAL ================= */}
                   {showVaccineModal && (
-                    <div className="modal-overlay">
-                      <div className="modal-content" style={{ maxWidth: "540px" }}>
-                        <div className="modal-header">
+                    <div className="appt-modal-overlay">
+                      <div className="appt-modal-content" style={{ maxWidth: "540px" }}>
+                        <div className="appt-modal-header">
                           <h2>Add Vaccination</h2>
-                          <button className="modal-close" onClick={() => setShowVaccineModal(false)}>
+                          <button className="appt-modal-close" onClick={() => setShowVaccineModal(false)}>
                             &times;
                           </button>
                         </div>
 
-                        <div className="modal-body">
+                        <div className="appt-modal-body">
                           <form
                             onSubmit={async (e) => {
                               e.preventDefault();
@@ -803,16 +803,16 @@ export default function PatientsPage() {
 
                   {/* ==================== ADD CONSULTATION MODAL ==================== */}
                   {showConsultationModal && (
-                    <div className="modal-overlay">
-                      <div className="modal-content" style={{ maxWidth: "640px" }}>
-                        <div className="modal-header">
+                    <div className="appt-modal-overlay">
+                      <div className="appt-modal-content" style={{ maxWidth: "640px" }}>
+                        <div className="appt-modal-header">
                           <h2>New Consultation Note</h2>
-                          <button className="modal-close" onClick={toggleConsultationModal}>
+                          <button className="appt-modal-close" onClick={toggleConsultationModal}>
                             &times;
                           </button>
                         </div>
 
-                        <div className="modal-body">
+                        <div className="appt-modal-body">
                           <p>
                             For: <strong>{selectedPatient?.fullName}</strong> | Date:{" "}
                             {new Date().toLocaleDateString("en-GB")}
@@ -1067,16 +1067,16 @@ export default function PatientsPage() {
 
                       {/* ================= ADD MILESTONE MODAL ================= */}
                       {showMilestoneModal && (
-                        <div className="modal-overlay">
-                          <div className="modal-content" style={{ maxWidth: "540px" }}>
-                            <div className="modal-header">
+                        <div className="appt-modal-overlay">
+                          <div className="appt-modal-content" style={{ maxWidth: "540px" }}>
+                            <div className="appt-modal-header">
                               <h2>Add New Milestone</h2>
-                              <button className="modal-close" onClick={() => setShowMilestoneModal(false)}>
+                              <button className="appt-modal-close" onClick={() => setShowMilestoneModal(false)}>
                                 &times;
                               </button>
                             </div>
 
-                            <div className="modal-body">
+                            <div className="appt-modal-body">
                               <form
                                 onSubmit={async (e) => {
                                   e.preventDefault();
