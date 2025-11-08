@@ -10,8 +10,9 @@ type KPI = {
 type Appointment = {
   id: number;
   patientName: string;
-  doctorName: string; // add this
+  doctorName: string;
   time: string;
+  reason: string; 
 };
 
 type Vaccination = {
@@ -65,12 +66,14 @@ export default function ClinicDashboard() {
           ? [apptDataRaw] // if a single object is returned, wrap it in array
           : [];
 
-        const apptData: Appointment[] = apptArray.map((a: any) => ({
-          id: a.id,
-          patientName: a.patientname || a.patientName || "Unknown",
-          doctorName: a.doctorname || a.doctorName || "Unknown",
-          time: a.time?.slice(0, 5) || "Unknown",
-        }));
+          const apptData: Appointment[] = apptArray.map((a: any) => ({
+            id: a.id,
+            patientName: a.patientname || a.patientName || "Unknown",
+            doctorName: a.doctorname || a.doctorName || "Unknown",
+            time: a.time?.slice(0, 5) || "Unknown",
+            reason: a.reason || "—", // 🩺 ADD THIS LINE
+          }));
+
 
         const vacData: Vaccination[] = (vacDataRaw || []).map((v: any) => ({
           id: v.id,
@@ -106,7 +109,7 @@ export default function ClinicDashboard() {
     loadDashboardData();
   }, []);
 
-return (
+ return (
   <>
     <Header />
 
@@ -147,11 +150,11 @@ return (
                 ) : (
                   <ul className="dashboard-list">
                     {appointments.map((a) => (
-                      <li key={a.id} className="dashboard-item">
-                        <span className="item-time">{a.time?.slice(0, 5)}</span>
-                        <span className="item-name">{a.patientName}</span>
-                        <span className="item-reason">{a.doctorName}</span>
-                      </li>
+                  <li key={a.id} className="dashboard-item">
+                    <span className="item-time">{a.time}</span>
+                    <span className="item-name">{a.patientName}</span>
+                    <span className="item-reason">{a.reason}</span>
+                  </li>
                     ))}
                   </ul>
                 )}
