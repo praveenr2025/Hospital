@@ -76,7 +76,7 @@ export default function ReferralsPage() {
           </div>
 
           <div className="table-container">
-            <table className="styled-table">
+             <table className="table" className="table">
               <thead>
                 <tr>
                   <th>Date</th>
