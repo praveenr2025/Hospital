@@ -184,76 +184,93 @@ useEffect(() => {
               // Use inline style for error color
               <p style={{ color: "var(--bad)" }}>{error}</p>
             ) : (
-              // Use default <table> styling from CSS
-              <table>
-                {/* Use default <thead> styling from CSS */}
-                <thead>
-                  <tr>
-                    {[
-                      "Time",
-                      "Patient",
-                      "Doctor",
-                      "Reason",
-                      "Type",
-                      "Status",
-                      "Actions",
-                    ].map((th) => (
-                      // Use default <th> styling from CSS
-                      <th key={th}>{th}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {appointments.length === 0 ? (
-                    <tr>
-                      {/* Use default <td> styling, add inline style for text-align */}
-                      <td colSpan={7} style={{ textAlign: "center" }}>
-                        No appointments today.
-                      </td>
-                    </tr>
-                  ) : (
-                    appointments.map((appt) => (
-                      <tr key={appt.id}>
-                        {/* Use default <td> styling from CSS */}
-                        <td>{appt.time}</td>
-                        <td>{appt.patientName}</td>
-                        <td>{appt.doctorName}</td>
-                        <td>{appt.reason}</td>
-                        <td>
-                          <span className="status-pill ordered">{appt.type}</span></td>
-                        <td>
-                          <span className={`status-pill ${getStatusClass(appt.status)}`}>
-                            {appt.status}
-                          </span>
-                        </td>
-                        <td>
-                        {/* Remind Button */}
-                        <button 
-                          className="btn warn" // Use 'warn' style (orange)
-                          onClick={() => alert(`Reminder action for appointment ${appt.id}`)}
-                          style={{ marginRight: '8px' }} // Add some space between buttons
-                        >
-                          Remind
-                        </button>
-                        
-                        {/* Cancel Button */}
-                        <button 
-                          className="btn bad" // Use 'bad' style (red)
-                          onClick={() => {
-                            if (confirm(`Are you sure you want to cancel the appointment for ${appt.patientName}?`)) {
-                              // Add logic here to call an API to cancel the appointment
-                              alert(`Cancel action for appointment ${appt.id}`); 
-                            }
-                          }}
-                        >
-                          Cancel
-                        </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+              // Use default  <table className="table"> styling from CSS
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          {["Time", "Patient", "Doctor", "Reason", "Type", "Status", "Actions"].map((th) => (
+                            <th key={th}>{th}</th>
+                          ))}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {appointments.length === 0 ? (
+                          <tr>
+                            <td colSpan={7} style={{ textAlign: "center" }}>No appointments today.</td>
+                          </tr>
+                        ) : (
+                          appointments.map((appt) => (
+                            <tr key={appt.id}>
+                              {/* Time */}
+                              <td style={{ fontWeight: 700, color: "#0f172a" }}>
+                                {appt.time ? appt.time.slice(0, 5) : "--"}
+                              </td>
+
+                              {/* Patient Name */}
+                              <td>
+                                <span style={{ color: "#2563eb", fontWeight: 600 }}>{appt.patientName}</span>
+                              </td>
+
+                              {/* Doctor */}
+                              <td style={{ color: "#475569" }}>{appt.doctorName}</td>
+
+                              {/* Reason */}
+                              <td style={{ color: "#64748b" }}>{appt.reason || "—"}</td>
+
+                              {/* Type */}
+                              <td>
+                                <span className="status-pill ordered">{appt.type || "Walk-in"}</span>
+                              </td>
+
+                              {/* Status */}
+                              <td>
+                                <span
+                                  className={`status-pill ${
+                                    appt.status?.toLowerCase() === "completed"
+                                      ? "completed"
+                                      : appt.status?.toLowerCase() === "scheduled"
+                                      ? "primary"
+                                      : appt.status?.toLowerCase() === "cancelled"
+                                      ? "overdue"
+                                      : "pending"
+                                  }`}
+                                >
+                                  {appt.status}
+                                </span>
+                              </td>
+
+                              {/* Actions */}
+                              <td>
+                                <button
+                                  className="btn warn"
+                                  onClick={() => alert(`Reminder action for appointment ${appt.id}`)}
+                                  style={{ marginRight: "8px" }}
+                                >
+                                  Remind
+                                </button>
+
+                                <button
+                                  className="btn bad"
+                                  onClick={() => {
+                                    if (
+                                      confirm(
+                                        `Are you sure you want to cancel the appointment for ${appt.patientName}?`
+                                      )
+                                    ) {
+                                      alert(`Cancel action for appointment ${appt.id}`);
+                                    }
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+
             )}
           </div>
         </div>
