@@ -367,3 +367,372 @@ export const createReferral = async (req, res) => {
     res.status(500).json({ message: "Failed to create referral." });
   }
 };
+
+
+export const getAppointmentsByPatient = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT a.*, s.full_name AS doctor_name
+       FROM appointments a
+       JOIN staff s ON s.id = a.doctor_id
+       WHERE a.patient_id = $1
+       ORDER BY a.date DESC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch appointments" });
+  }
+};
+
+
+export const getMilestonesByPatient = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM milestones WHERE patient_id = $1 ORDER BY typical_age ASC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch milestones" });
+  }
+};
+
+// ------------------ VACCINATION RECORDS ------------------
+
+export const getVaccinationsByPatient = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT vr.id, v.name AS vaccine_name, v.vaccine_id, vr.date_given, vr.batch_number, vr.status, vr.notes
+       FROM vaccination_records vr
+       JOIN vaccines v ON vr.vaccine_id = v.id
+       WHERE vr.patient_id = $1
+       ORDER BY v.name ASC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching vaccinations:", err);
+    res.status(500).json({ message: "Failed to fetch vaccination records." });
+  }
+};
+
+export const updateMilestoneStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE milestones 
+       SET status = $1, achieved_date = CASE WHEN $1 = 'Achieved' THEN NOW() ELSE achieved_date END
+       WHERE id = $2
+       RETURNING *`,
+      [status, id]
+    );
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ message: "Milestone not found." });
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating milestone:", err);
+    res.status(500).json({ message: "Failed to update milestone status." });
+  }
+};
+// ------------------ GROWTH RECORDS ------------------
+
+// ------------------ GROWTH RECORDS ------------------
+
+export const getGrowthByPatient = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT id, date, weight, height, head_circumference, status, notes
+       FROM growth_records 
+       WHERE patient_id = $1 
+       ORDER BY date ASC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching growth records:", err);
+    res.status(500).json({ message: "Failed to fetch growth chart." });
+  }
+};
+
+export const addGrowthRecord = async (req, res) => {
+  const { id } = req.params; // patient_id
+  const { date, weight, height, headCircumference, status, notes } = req.body;
+
+  if (!date || !weight || !height) {
+    return res.status(400).json({ message: "Date, weight, and height are required." });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO growth_records 
+        (patient_id, date, weight, height, head_circumference, status, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING *`,
+      [
+        id, // patient_id from URL
+        date, // user-provided date
+        weight,
+        height,
+        headCircumference || null,
+        status || "Pending", // default to Pending
+        notes || "", // optional field
+      ]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error adding growth record:", err);
+    res.status(500).json({ message: "Failed to add growth record." });
+  }
+};
+
+
+export const updateGrowthRecordStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status)
+    return res.status(400).json({ message: "Status is required." });
+
+  try {
+    const result = await pool.query(
+      `UPDATE growth_records 
+       SET status = $1 
+       WHERE id = $2 
+       RETURNING *`,
+      [status, id]
+    );
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ message: "Growth record not found." });
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating growth record status:", err);
+    res.status(500).json({ message: "Failed to update growth record." });
+  }
+};
+
+export const createConsultation = async (req, res) => {
+  const {
+    patientId,
+    doctorId,        // 👈 Make sure this is received from frontend
+    temperature,
+    heartRate,
+    respRate,
+    symptoms,
+    diagnosis,
+    treatmentPlan,
+    prescription,
+  } = req.body;
+
+  if (!patientId || !doctorId) {
+    return res.status(400).json({ message: "Missing required fields: patientId or doctorId" });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO consultations 
+         (patient_id, doctor_id, temperature, heart_rate, resp_rate, symptoms, diagnosis, treatment_plan, prescription)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       RETURNING *`,
+      [
+        patientId,
+        doctorId,
+        temperature || null,
+        heartRate || null,
+        respRate || null,
+        symptoms || null,
+        diagnosis || null,
+        treatmentPlan || null,
+        prescription || null,
+      ]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error saving consultation:", err);
+    res.status(500).json({ message: "Failed to save consultation" });
+  }
+};
+// ------------------ CONSULTATIONS ------------------
+// ==================== GET CONSULTATIONS BY PATIENT ====================
+export const getConsultationsByPatient = async (req, res) => {
+  const { id } = req.params; // patient_id
+
+  try {
+    const result = await pool.query(
+      `SELECT c.*, s.full_name AS doctor_name
+       FROM consultations c
+       LEFT JOIN staff s ON c.doctor_id = s.id
+       WHERE c.patient_id = $1
+       ORDER BY c.consultation_date DESC`,
+      [id]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching consultations:", err);
+    res.status(500).json({ message: "Failed to fetch consultations." });
+  }
+};
+
+export const addVaccinationRecord = async (req, res) => {
+  const { id: patientId } = req.params;
+  const { vaccineId, dateGiven } = req.body;
+
+  if (!vaccineId) {
+    return res.status(400).json({ message: "Vaccine ID is required." });
+  }
+
+  try {
+    // Check if record already exists
+    const existing = await pool.query(
+      `SELECT * FROM patient_vaccinations WHERE patient_id = $1 AND vaccine_id = $2`,
+      [patientId, vaccineId]
+    );
+
+    let result;
+
+    if (existing.rows.length > 0) {
+      // ✅ Update existing record
+      result = await pool.query(
+        `UPDATE patient_vaccinations
+         SET status = 'Given', date_given = $3
+         WHERE patient_id = $1 AND vaccine_id = $2
+         RETURNING *`,
+        [patientId, vaccineId, dateGiven]
+      );
+    } else {
+      // ✅ Create new record
+      result = await pool.query(
+        `INSERT INTO patient_vaccinations (patient_id, vaccine_id, status, date_given)
+         VALUES ($1, $2, 'Given', $3)
+         RETURNING *`,
+        [patientId, vaccineId, dateGiven]
+      );
+    }
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ Error updating vaccination:", err);
+    res.status(500).json({ message: "Failed to update vaccination record." });
+  }
+};
+export const getPatientVaccinations = async (req, res) => {
+  const { id: patientId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT v.id, v.name, v.due_range, pv.status, pv.date_given
+       FROM vaccines v
+       LEFT JOIN patient_vaccinations pv
+       ON v.id = pv.vaccine_id AND pv.patient_id = $1
+       ORDER BY v.id ASC`,
+      [patientId]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ Error fetching patient vaccinations:", err);
+    res.status(500).json({ message: "Failed to fetch vaccination data." });
+  }
+};
+
+export const getPatientMilestones = async (req, res) => {
+  const { id: patientId } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT id, milestone_name, typical_age, status, achieved_date
+       FROM milestones
+       WHERE patient_id = $1
+       ORDER BY id ASC`,
+      [patientId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching milestones:", err);
+    res.status(500).json({ message: "Failed to load milestones." });
+  }
+};
+
+// ------------------- UPDATE MILESTONE STATUS -------------------
+export const updatePatientMilestone = async (req, res) => {
+  const { id: patientId } = req.params;
+  const { milestoneId, dateAchieved } = req.body;
+
+  console.log("➡️ Incoming milestone update:", { patientId, milestoneId, dateAchieved });
+
+  try {
+    const result = await pool.query(
+      `UPDATE milestones 
+       SET status = 'Achieved', achieved_date = $1
+       WHERE id = $2 AND patient_id = $3
+       RETURNING id, milestone_name, typical_age, status, achieved_date`,
+      [dateAchieved, milestoneId, patientId]
+    );
+
+    if (result.rowCount === 0) {
+      console.log("⚠️ No milestone found for update.");
+      return res.status(404).json({ message: "Milestone not found for patient." });
+    }
+
+    console.log("✅ Milestone updated:", result.rows[0]);
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ Error updating milestone:", err);
+    res.status(500).json({ message: "Failed to update milestone." });
+  }
+};
+export const addMilestone = async (req, res) => {
+  const { id } = req.params;
+  const { milestone_name, typical_age } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO milestones (patient_id, milestone_name, typical_age, status)
+       VALUES ($1, $2, $3, 'Pending')
+       RETURNING *`,
+      [id, milestone_name, typical_age]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error adding milestone:", err);
+    res.status(500).json({ message: "Failed to add milestone" });
+  }
+};
+export const getLabOrdersByPatient = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM lab_orders WHERE patient_id = $1 ORDER BY order_date DESC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch lab orders" });
+  }
+};
+
+export const getInvoicesByPatient = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM invoices WHERE patient_id = $1 ORDER BY id DESC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch invoices" });
+  }
+};
