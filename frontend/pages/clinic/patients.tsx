@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../components/layout/clinic/Header";
 
-// TypeScript types
 type Patient = {
   id: number;
   fullName: string;
@@ -16,12 +15,58 @@ type Patient = {
   address?: string;
   bloodGroup?: string;
   allergies?: string;
-  nextAppointment?: string;
-  // Added age for the new column from the screenshot
   age: string;
 };
 
-// Helper function to calculate age
+type Vaccine = {
+  id: number;
+  name: string;
+  vaccine_id: string;
+  due_range?: string | null;
+  status?: "Given" | "Pending" | "Out Of Stock" | null;
+  date_given?: string | null;
+};
+
+type Milestone = {
+  id: number;
+  milestone_name: string;
+  typical_age: string;
+  status: string;
+  achieved_date?: string | null;
+};
+
+type LabOrder = {
+  id: number;
+  test_name: string;
+  test_type: string;
+  order_date: string;
+  status: string;
+};
+
+type Invoice = {
+  id: number;
+  invoice_date: string;
+  total_amount: number;
+  status: string;
+};
+
+type Growth = {
+  id: number;
+  date: string;
+  weight: number;
+  height: number;
+  head_circumference?: number;
+};
+
+type Tab =
+  | "fullhistory"
+  | "consultations"
+  | "vaccinations"
+  | "milestones"
+  | "labimaging"
+  | "billing";
+
+// ==================== Helper ====================
 function calculateAge(dob: string) {
   if (!dob) return "";
   const birthDate = new Date(dob);
@@ -39,50 +84,55 @@ function calculateAge(dob: string) {
     months += 12;
   }
 
-  if (years > 0) {
-    return `${years}y ${months}m`;
-  } else if (months > 0) {
-    return `${months}m ${days}d`;
-  } else {
-    return `${days}d`;
-  }
+  if (years > 0) return `${years}y ${months}m`;
+  if (months > 0) return `${months}m ${days}d`;
+  return `${days}d`;
 }
 
+function formatDate(dateString: string) {
+  if (!dateString) return "";
+  return new Date(dateString).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+// ==================== Main Component ====================
 export default function PatientsPage() {
-  const [modalOpen, setModalOpen] = useState(false);
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState<Tab>("consultations");
+  const [appointments, setAppointments] = useState<any[]>([]);
 
-  // Form States
-  const [fullName, setFullName] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("M");
-  const [guardianPrimary, setGuardianPrimary] = useState("");
-  const [contactPrimary, setContactPrimary] = useState("");
-  const [guardianSecondary, setGuardianSecondary] = useState("");
-  const [contactSecondary, setContactSecondary] = useState("");
-  const [address, setAddress] = useState("");
-  const [bloodGroup, setBloodGroup] = useState("");
-  const [allergies, setAllergies] = useState("");
+  const [consultations, setConsultations] = useState<any[]>([]);
+  const [vaccines, setVaccines] = useState<Vaccine[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [labOrders, setLabOrders] = useState<LabOrder[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [growthRecords, setGrowthRecords] = useState<Growth[]>([]);
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const [showGrowthModal, setShowGrowthModal] = useState(false);
+  const [showVaccineModal, setShowVaccineModal] = useState(false);
+  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const toggleModal = () => setModalOpen(!modalOpen);
 
-  // Fetch patients on load
+  const toggleConsultationModal = () => setShowConsultationModal(!showConsultationModal);
+
+  // ==================== Fetch Patients (Initial Load) ====================
   useEffect(() => {
     const loadPatients = async () => {
       try {
         setLoading(true);
-        setError("");
         const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients");
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
-
-        // Normalize data from snake_case to camelCase
-        const normalizedPatients: Patient[] = data.map((p: any) => ({
+        const normalized = data.map((p: any) => ({
           id: p.id,
           fullName: p.full_name,
-          // Store DOB as YYYY-MM-DD for consistency
           dob: p.dob,
           age: calculateAge(p.dob),
           gender: p.gender,
@@ -93,21 +143,10 @@ export default function PatientsPage() {
           address: p.address,
           bloodGroup: p.blood_group,
           allergies: p.allergies,
-          // Format next appointment time
-          nextAppointment: p.next_appointment
-            ? new Date(p.next_appointment).toLocaleString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })
-            : "None scheduled",
         }));
-        setPatients(normalizedPatients);
-      } catch (err: any) {
-        setError("Failed to load patients from backend.");
+        setPatients(normalized);
+      } catch (err) {
+        setError("Failed to load patients");
       } finally {
         setLoading(false);
       }
@@ -115,333 +154,1314 @@ export default function PatientsPage() {
     loadPatients();
   }, []);
 
-  // Handle form submit
-  const handleSavePatient = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // ==================== Fetch Selected Patient Data ====================
+  // Combined the two identical useEffects into one
+  useEffect(() => {
+    if (!selectedPatient) return;
 
-    if (!fullName || !dob || !gender || !guardianPrimary || !contactPrimary) {
-      alert("Please fill all required fields.");
-      return;
-    }
+    (async () => {
+      try {
+        // Fetch all patient related data concurrently
+        const [c, l, i, a, m, v, g] = await Promise.all([
+          fetch(`https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/consultations`),
+          fetch(`https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/lab-orders`),
+          fetch(`https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/invoices`),
+          fetch(`https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/appointments`),
+          fetch(`https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/milestones`),
+          fetch(`https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/vaccinations`),
+          fetch(`https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/growth`),
+        ]);
 
-    try {
-      const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName,
-          dob,
-          gender,
-          guardianPrimary,
-          contactPrimary,
-          guardianSecondary,
-          contactSecondary,
-          address,
-          bloodGroup,
-          allergies,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        const newPatient: Patient = {
-          id: data.id,
-          fullName: data.full_name,
-          dob: data.dob,
-          age: calculateAge(data.dob),
-          gender: data.gender,
-          guardianPrimary: data.guardian_primary,
-          contactPrimary: data.contact_primary,
-          guardianSecondary: data.guardian_secondary,
-          contactSecondary: data.contact_secondary,
-          address: data.address,
-          bloodGroup: data.blood_group,
-          allergies: data.allergies,
-          nextAppointment: "None scheduled", // New patient won't have one yet
-        };
-        setPatients((prev) => [...prev, newPatient]);
-        toggleModal();
-        // Reset form
-        setFullName("");
-        setDob("");
-        setGender("M");
-        setGuardianPrimary("");
-        setContactPrimary("");
-        setGuardianSecondary("");
-        setContactSecondary("");
-        setAddress("");
-        setBloodGroup("");
-        setAllergies("");
-      } else {
-        alert(data.message || "Failed to add patient.");
+        setConsultations(await c.json());
+        setLabOrders(await l.json());
+        setInvoices(await i.json());
+        setAppointments(await a.json());
+        setMilestones(await m.json());
+        setVaccines(await v.json());
+        setGrowthRecords(await g.json());
+      } catch (err) {
+        console.error("Error fetching patient data:", err);
       }
-    } catch (err) {
-      alert("Server error. Try again.");
-    }
-  };
+    })();
+  }, [selectedPatient]);
 
-  // Helper to format Date of Birth for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  };
 
+  // ==================== JSX ====================
   return (
     <>
       <Header />
-      {/* Use .body class for main content area */}
       <main className="body">
-        {/* Patients Directory Card */}
-        {/* Use .card class, add inline styles for max-width and margin */}
-        <div
-          className="card"
-          style={{ maxWidth: "1280px", margin: "16px auto" }}
-        >
-          {/* Use .row class, add inline style for alignment and margin */}
-          <div
-            className="row"
-            style={{ alignItems: "center", marginBottom: "16px" }}
-          >
-            <h2 style={{ margin: 0 }}>Patient Directory</h2>
-            {/* Use default <input> styling, add inline style for max-width */}
-            <input
-              type="text"
-              placeholder="🔍 Search by name, parent, or contact..."
-              style={{ maxWidth: "350px", marginLeft: "16px" }}
-              // TODO: add search logic
-            />
-            {/* Use .btn, .ok, and .right classes */}
-            <button
-              type="button"
-              onClick={toggleModal}
-              className="btn ok right"
-            >
-              ＋ Add New Patient
-            </button>
-          </div>
+        {/* ================= ADD PATIENT MODAL ================= */}
+          {modalOpen && (
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h2>Register New Patient</h2>
+                  <button
+                    className="modal-close"
+                    onClick={() => setModalOpen(false)}
+                    aria-label="Close"
+                  >
+                    &times;
+                  </button>
+                </div>
 
-          {/* Use inline style for overflow */}
-          <div style={{ overflowX: "auto" }}>
+                <div className="modal-body">
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const form = e.currentTarget;
+                      const data = Object.fromEntries(new FormData(form).entries());
+
+                      if (!data.fullName || !data.dob || !data.guardianPrimary || !data.contactPrimary) {
+                        alert("⚠️ Please fill all required fields.");
+                        return;
+                      }
+
+                      try {
+                        const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify(data),
+                        });
+
+                        const newPatient = await res.json();
+                        if (res.ok) {
+                          setPatients((prev) => [
+                            ...prev,
+                            {
+                              id: newPatient.id,
+                              fullName: newPatient.full_name,
+                              dob: newPatient.dob,
+                              age: calculateAge(newPatient.dob),
+                              gender: newPatient.gender,
+                              guardianPrimary: newPatient.guardian_primary,
+                              contactPrimary: newPatient.contact_primary,
+                              guardianSecondary: newPatient.guardian_secondary,
+                              contactSecondary: newPatient.contact_secondary,
+                              address: newPatient.address,
+                              bloodGroup: newPatient.blood_group,
+                              allergies: newPatient.allergies,
+                            },
+                          ]);
+                          alert("✅ Patient added successfully!");
+                          setModalOpen(false);
+                          form.reset();
+                        } else {
+                          alert(newPatient.message || "❌ Failed to save patient.");
+                        }
+                      } catch (err) {
+                        console.error("Error adding patient:", err);
+                        alert("Server error while saving patient.");
+                      }
+                    }}
+                  >
+                    <section>
+                      <h4>Patient Details</h4>
+                      <div className="form-grid">
+                        <input name="fullName" placeholder="Full Name" required />
+                        <div className="form-grid">
+                          <input name="dob" type="date" required />
+                          <select name="gender" defaultValue="M" required>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                          </select>
+                        </div>
+                      </div>
+                    </section>
+
+                    <hr />
+
+                    <section>
+                      <h4>Guardian & Contact Details</h4>
+                      <div className="form-grid">
+                        <input name="guardianPrimary" placeholder="Primary Parent/Guardian Name" required />
+                        <input name="contactPrimary" placeholder="Primary Contact Number" required />
+                        <input name="guardianSecondary" placeholder="Secondary Parent/Guardian Name" />
+                        <input name="contactSecondary" placeholder="Secondary Contact Number" />
+                        <textarea name="address" placeholder="Address" rows={2} />
+                      </div>
+                    </section>
+
+                    <hr />
+
+                    <section>
+                      <h4>Medical Information</h4>
+                      <div className="form-grid">
+                        <input name="bloodGroup" placeholder="e.g., O+" />
+                        <input name="allergies" placeholder="Known Allergies" />
+                      </div>
+                    </section>
+
+                    <div className="modal-footer">
+                      <button type="submit" className="btn ok">
+                        Save Patient Record
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+        {/* ==================== PATIENT DIRECTORY ==================== */}
+        {!selectedPatient && (
+          <div className="card" style={{ maxWidth: "1280px", margin: "12px auto" }}>
+            <div
+              className="flex-between"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+            >
+              <h2>Patient Directory</h2>
+              <div style={{ margin: "12px 0", display: "flex", justifyContent: "flex-end" }}>
+              <input
+                type="text"
+                placeholder="🔍 Search by name, guardian, or contact..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  padding: "8px 14px",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  width: "280px",
+                  fontSize: "14px",
+                  outline: "none",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                }}
+              />
+            </div>
+              <button className="btn ok" onClick={() => setModalOpen(true)}>
+                ＋ Add New Patient
+              </button>
+            </div>
+
             {loading ? (
               <p>Loading patients...</p>
             ) : error ? (
-              // Use inline style for error color
-              <p style={{ color: "var(--bad)" }}>{error}</p>
+              <p>{error}</p>
             ) : (
-              // Use default <table> styling
-              <table>
-                {/* Use default <thead> styling */}
+               <table className="table">
                 <thead>
                   <tr>
-                    {/* Add all columns from screenshot */}
                     <th>Name</th>
                     <th>Age</th>
                     <th>Date of Birth</th>
                     <th>Primary Contact</th>
-                    <th>Next Appointment</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {patients.length === 0 ? (
-                    <tr>
-                      {/* Use inline style for text alignment */}
-                      <td colSpan={5} style={{ textAlign: "center" }}>
-                        No patients found.
-                      </td>
-                    </tr>
-                  ) : (
-                    patients.map((p) => (
-                      <tr key={p.id} className="clickable">
-                        {/* Use default <td> styling */}
-                        <td>{p.fullName}</td>
-                        <td>{p.age}</td>
-                        <td>{formatDate(p.dob)}</td>
-                        <td>
-                          {p.guardianPrimary} ({p.contactPrimary})
-                        </td>
-                        <td>{p.nextAppointment}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
+                  {patients
+                  .filter(
+                    (p) =>
+                      p.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      p.guardianPrimary.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      p.contactPrimary.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map((p) => (
+                    <tr
+                      key={p.id}
+                      className="clickable"
+                      onClick={() => setSelectedPatient(p)}
+                    >
+                                <td style={{ color: "#2563eb", fontWeight: 600 }}>{p.fullName}</td>
+                                <td>{p.age}</td>
+                                <td>{formatDate(p.dob)}</td>
+                                <td>
+                                  {p.guardianPrimary} ({p.contactPrimary})
+                                </td>
+                              </tr>
+                            ))}
+                  </tbody>
               </table>
-            )}
-
-            {/* Pagination Controls */}
-            {/* Use .inline class for flex, add inline style for margin */}
-            <div className="inline" style={{ marginTop: "12px" }}>
-              {/* Use .tab class for pagination button styling */}
-              <button className="tab">Previous</button>
-              <span style={{ padding: "0 12px", fontSize: "14px" }}>
-                Page 1
-              </span>
-              <button className="tab">Next</button>
-              {/* Use default <select> styling */}
-              <select defaultValue="10" style={{ marginLeft: "8px" }}>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="20">20</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Add Patient Modal */}
-        {modalOpen && (
-          // Use .modal-overlay
-          <div className="modal-overlay">
-            {/* Use .modal-content, add inline style for max-width */}
-            <div className="modal-content" style={{ maxWidth: "512px" }}>
-              {/* Use .modal-header */}
-              <div className="modal-header">
-                <h2>Register New Patient</h2>
-                {/* Use .modal-close */}
-                <button
-                  onClick={toggleModal}
-                  className="modal-close"
-                  aria-label="Close modal"
-                >
-                  &times;
-                </button>
-              </div>
-
-              {/* Use .modal-body for scrolling */}
-              <div className="modal-body">
-                <form onSubmit={handleSavePatient}>
-                  {/* Each form section is wrapped in .row for margin */}
-                  <div className="row">
-                    <h4>Patient Details</h4>
-                    <input
-                      type="text"
-                      placeholder="Full Name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                      style={{ width: "100%" }}
-                    />
-                  </div>
-
-                  <div className="row">
-                    {/* Use .form-grid for 2-column layout */}
-                    <div className="form-grid">
-                      <input
-                        type="date"
-                        value={dob}
-                        onChange={(e) => setDob(e.target.value)}
-                        required
-                        max={new Date().toISOString().split("T")[0]}
-                        style={{ width: "100%" }}
-                      />
-                      <select
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                        required
-                        style={{ width: "100%" }}
-                      >
-                        <option value="M">Male</option>
-                        <option value="F">Female</option>
-                      </select>
+                      )}
                     </div>
-                  </div>
+                  )}
 
-                  <div className="row">
-                    <h4>Guardian & Contact Details</h4>
-                    <div className="form-grid">
-                      <input
-                        type="text"
-                        placeholder="Primary Parent/Guardian Name"
-                        value={guardianPrimary}
-                        onChange={(e) => setGuardianPrimary(e.target.value)}
-                        required
-                        style={{ width: "100%" }}
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Primary Contact Number"
-                        value={contactPrimary}
-                        onChange={(e) => setContactPrimary(e.target.value)}
-                        required
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                  </div>
+        {/* ==================== PATIENT DETAILS (COMBINED INTO MAIN COMPONENT) ==================== */}
+        {selectedPatient && (
+          <div className="page" style={{ maxWidth: "1280px", margin: "12px auto" }}>
+            <button className="btn ghost" onClick={() => setSelectedPatient(null)}>
+              ← Back to All Patients
+            </button>
 
-                  <div className="row">
-                    <div className="form-grid">
-                      <input
-                        type="text"
-                        placeholder="Secondary Parent/Guardian Name"
-                        value={guardianSecondary}
-                        onChange={(e) => setGuardianSecondary(e.target.value)}
-                        style={{ width: "100%" }}
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Secondary Contact Number"
-                        value={contactSecondary}
-                        onChange={(e) => setContactSecondary(e.target.value)}
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                  </div>
+            <div className="grid">
+              {/* LEFT PANEL */}
+              <div className="cols-1">
+                <div className="card">
+                  <h2>{selectedPatient.fullName}</h2>
+                  <p>
+                    DOB: {formatDate(selectedPatient.dob)} | Age: {selectedPatient.age}
+                  </p>
+                  <p>
+                    <strong>Blood Group:</strong> {selectedPatient.bloodGroup || "—"}
+                  </p>
+                  <p>
+                    <strong>Allergies:</strong> {selectedPatient.allergies || "None"}
+                  </p>
+                  <hr />
+                  <h4>Contact Information</h4>
+                  <p>
+                    {selectedPatient.guardianPrimary} ({selectedPatient.contactPrimary})
+                  </p>
+                  {selectedPatient.guardianSecondary && (
+                    <p>
+                      {selectedPatient.guardianSecondary} ({selectedPatient.contactSecondary})
+                    </p>
+                  )}
+                  <p>{selectedPatient.address}</p>
+                </div>
 
-                  <div className="row">
-                    <textarea
-                      placeholder="Address"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      rows={2}
-                      // Use inline style for width and resize
-                      style={{ width: "100%", resize: "none" }}
-                    />
-                  </div>
+                <div className="card" style={{ marginTop: "16px" }}>
+                  <h4>Growth Chart</h4>
 
-                  <div className="row">
-                    <h4>Medical Information</h4>
-                    <input
-                      type="text"
-                      placeholder="Blood Group (e.g., O+)"
-                      value={bloodGroup}
-                      onChange={(e) => setBloodGroup(e.target.value)}
-                      style={{ width: "100%" }}
-                    />
-                  </div>
+                  {/* --- Table --- */}
+                   <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Wt (kg)</th>
+                        <th>Ht (cm)</th>
+                        <th>HC (cm)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {growthRecords.length > 0 ? (
+                        growthRecords.map((g) => (
+                          <tr key={g.id}>
+                            <td>{formatDate(g.date)}</td>
+                            <td>{g.weight}</td>
+                            <td>{g.height}</td>
+                            <td>{g.head_circumference || "—"}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={4} style={{ textAlign: "center" }}>
+                            No records yet
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
 
-                  <div className="row">
-                    <input
-                      type="text"
-                      placeholder="Known Allergies"
-                      value={allergies}
-                      onChange={(e) => setAllergies(e.target.value)}
-                      style={{ width: "100%" }}
-                    />
-                  </div>
-
-                  {/* Submit Button */}
-                  {/* Use inline style for alignment and padding */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      paddingTop: "8px",
-                    }}
-                  >
-                    {/* Use .btn and .ok classes */}
-                    <button type="submit" className="btn ok">
-                      Save Patient Record
+                  <div style={{ textAlign: "right", marginTop: "12px" }}>
+                    <button className="btn ok small" onClick={() => setShowGrowthModal(true)}>
+                      ＋ Add Growth Record
                     </button>
                   </div>
-                </form>
+                </div>
               </div>
+
+              {/* RIGHT PANEL */}
+              <div className="cols-2">
+                <div className="card">
+                  <div className="tabs">
+                    {["fullhistory", "consultations", "vaccinations", "milestones", "labimaging", "billing"].map(
+                      (t) => (
+                        <div
+                          key={t}
+                          className={`tab ${activeTab === t ? "active" : ""}`}
+                          onClick={() => setActiveTab(t as Tab)}
+                        >
+                          {t === "fullhistory"
+                            ? "Full History"
+                            : t.charAt(0).toUpperCase() + t.slice(1)}
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  {/* ==================== FULL HISTORY TAB ==================== */}
+                  {activeTab === "fullhistory" && (
+                    <div>
+                      <h3>Patient 360° Timeline</h3>
+
+                      <div
+                        className="timeline"
+                        style={{
+                          marginTop: "20px",
+                          position: "relative",
+                          paddingLeft: "32px",
+                        }}
+                      >
+                        {/* Vertical timeline line */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: "15px",
+                            top: "0",
+                            bottom: "0",
+                            width: "2px",
+                            backgroundColor: "#e2e8f0",
+                          }}
+                        ></div>
+
+                        {[
+                          ...consultations.map((item) => ({
+                            type: "Consultation",
+                            date: item.consultation_date,
+                            title: `Consultation: ${item.diagnosis || "General Checkup"}`,
+                            desc: `Symptoms: ${item.symptoms || "—"} | Plan: ${item.treatment_plan || "—"}`,
+                            icon: "🩺",
+                            color: "#0ea5e9",
+                          })),
+
+                          ...labOrders
+                            .filter((item) => !!item.id)
+                            .map((item) => ({
+                              type: "Lab",
+                              date: item.order_date,
+                              title: `Lab Ordered: ${item.test_name}`,
+                              desc: `Type: ${item.test_type} | Status: ${item.status || "Pending"}`,
+                              icon: "🧪",
+                              color: "#7c3aed",
+                            })),
+
+                          ...invoices
+                            .filter((item) => !!item.id)
+                            .map((item) => ({
+                              type: "Invoice",
+                              date: item.invoice_date,
+                              title: `Invoice #${item.id} Generated: ₹ ${item.total_amount}`,
+                              desc: `Status: ${item.status || "Pending"}`,
+                              icon: "💰",
+                              color: "#f59e0b",
+                            })),
+
+                          ...appointments
+                            .filter((item) => !!item.id)
+                            .map((item) => ({
+                              type: "Appointment",
+                              date: item.appointment_date || item.date,
+                              title: `Appointment: ${item.reason || "Follow-up"}`,
+                              desc: `Doctor: ${item.doctor_name || "—"} | Status: ${
+                                item.status || "Scheduled"
+                              }`,
+                              icon: "📅",
+                              color: "#22c55e",
+                            })),
+                        ]
+                          // ✅ Only show entries that actually exist
+                          .filter((entry) => entry.date)
+                          // ✅ Sort by date descending
+                          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                          .map((entry, index) => (
+                            <div
+                              key={index}
+                              style={{
+                                position: "relative",
+                                marginBottom: "20px",
+                                paddingLeft: "16px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  left: "-28px",
+                                  top: "8px",
+                                  width: "36px",
+                                  height: "36px",
+                                  background: entry.color,
+                                  color: "white",
+                                  borderRadius: "50%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: "18px",
+                                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                                }}
+                              >
+                                {entry.icon}
+                              </div>
+
+                              <div
+                                style={{
+                                  background: "white",
+                                  borderRadius: "12px",
+                                  padding: "16px",
+                                  boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                                  border: "1px solid #f1f5f9",
+                                }}
+                              >
+                                <h4 style={{ margin: 0, color: "#111827" }}>{entry.title}</h4>
+                                <p style={{ margin: "4px 0", color: "#64748b", fontSize: "14px" }}>
+                                  {formatDate(entry.date)}
+                                </p>
+                                <p style={{ margin: 0, color: "#334155", fontSize: "14px" }}>
+                                  {entry.desc}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ================= CONSULTATIONS ================= */}
+                  {activeTab === "consultations" && (
+                    <div>
+                      <div className="flex-between" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <h3>Consultation History</h3>
+                        <button className="btn ok" onClick={toggleConsultationModal}>
+                          ＋ New Consultation
+                        </button>
+                      </div>
+
+                      {consultations.length > 0 ? (
+                        consultations
+                          .slice()
+                          .reverse()
+                          .map((c) => (
+                            <div
+                              key={c.id}
+                              className="card"
+                              style={{
+                                marginTop: "16px",
+                                padding: "16px",
+                                background: "#fff",
+                                borderRadius: "12px",
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                              }}
+                            >
+                              <p style={{ fontWeight: 600, color: "#1e293b" }}>
+                                Visit on {new Date(c.consultation_date).toLocaleDateString("en-GB")}
+                              </p>
+                              <p style={{ marginTop: "6px", fontSize: "14px", color: "#334155" }}>
+                                <strong>Temp:</strong> {c.temperature || "—"}°F &nbsp; | &nbsp;
+                                <strong>HR:</strong> {c.heart_rate || "—"} bpm &nbsp; | &nbsp;
+                                <strong>RR:</strong> {c.resp_rate || "—"} bpm
+                              </p>
+                              <p style={{ marginTop: "8px", fontSize: "14px" }}>
+                                <strong>Doctor:</strong> {c.doctor_name || "—"}
+                              </p>
+                              <p style={{ marginTop: "8px", fontSize: "14px" }}>
+                                <strong>Symptoms:</strong> {c.symptoms || "—"}
+                              </p>
+                              <p style={{ marginTop: "4px", fontSize: "14px" }}>
+                                <strong>Diagnosis:</strong> {c.diagnosis || "—"}
+                              </p>
+                              <p style={{ marginTop: "4px", fontSize: "14px" }}>
+                                <strong>Plan:</strong> {c.treatment_plan || "—"}
+                              </p>
+                            </div>
+                          ))
+                      ) : (
+                        <div
+                          style={{
+                            textAlign: "center",
+                            marginTop: "16px",
+                            padding: "24px",
+                            background: "#f8fafc",
+                            borderRadius: "8px",
+                            color: "#64748b",
+                          }}
+                        >
+                          No consultations yet
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ================= ADD GROWTH MODAL ================= */}
+                  {showGrowthModal && (
+                    <div className="modal-overlay">
+                      <div className="modal-content" style={{ maxWidth: "540px" }}>
+                        <div className="modal-header">
+                          <h2>Add Growth Record</h2>
+                          <button className="modal-close" onClick={() => setShowGrowthModal(false)}>
+                            &times;
+                          </button>
+                        </div>
+
+                        <div className="modal-body">
+                          <form
+                            onSubmit={async (e) => {
+                              e.preventDefault();
+                              const form = e.currentTarget;
+                              const data = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+
+                              try {
+                                const res = await fetch(
+                                  `https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient?.id}/growth`,
+                                  {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                      date: data.date,
+                                      weight: parseFloat(data.weight),
+                                      height: parseFloat(data.height),
+                                      headCircumference: data.headCircumference
+                                        ? parseFloat(data.headCircumference)
+                                        : null,
+                                    }),
+                                  }
+                                );
+
+                                if (res.ok) {
+                                  const newRecord = await res.json();
+                                  setGrowthRecords((prev) => [...prev, newRecord]);
+                                  alert("✅ Growth record added!");
+                                  form.reset();
+                                  setShowGrowthModal(false);
+                                } else {
+                                  alert("❌ Failed to save growth record.");
+                                }
+                              } catch (err) {
+                                console.error("Error adding growth record:", err);
+                                alert("Server error while adding growth record.");
+                              }
+                            }}
+                          >
+                            <div className="form-grid" style={{ display: "grid", gap: "8px" }}>
+                              <input name="date" type="date" required />
+                              <input name="weight" type="number" step="0.1" placeholder="Weight (kg)" required />
+                              <input name="height" type="number" step="0.1" placeholder="Height (cm)" required />
+                              <input
+                                name="headCircumference"
+                                type="number"
+                                step="0.1"
+                                placeholder="Head Circ. (cm)"
+                              />
+                            </div>
+
+                            <button className="btn ok" style={{ marginTop: "12px", width: "100%" }}>
+                              💾 Save Record
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ================= ADD VACCINATION MODAL ================= */}
+                  {showVaccineModal && (
+                    <div className="modal-overlay">
+                      <div className="modal-content" style={{ maxWidth: "540px" }}>
+                        <div className="modal-header">
+                          <h2>Add Vaccination</h2>
+                          <button className="modal-close" onClick={() => setShowVaccineModal(false)}>
+                            &times;
+                          </button>
+                        </div>
+
+                        <div className="modal-body">
+                          <form
+                            onSubmit={async (e) => {
+                              e.preventDefault();
+                              const form = e.currentTarget;
+                              const data = Object.fromEntries(new FormData(form).entries());
+
+                              const res = await fetch(
+                                `https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient?.id}/vaccinations`,
+                                {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({
+                                    vaccineId: data.vaccineId,
+                                    dateGiven: data.dateGiven,
+                                  }),
+                                }
+                              );
+
+                              if (res.ok) {
+                                const newRecord = await res.json();
+                                setVaccines((prev) =>
+                                  prev.map((v) =>
+                                    v.id === Number(data.vaccineId)
+                                      ? { ...v, status: "Given", date_given: newRecord.date_given }
+                                      : v
+                                  )
+                                );
+                                alert("✅ Vaccination added successfully!");
+                                form.reset();
+                                setShowVaccineModal(false);
+                              } else {
+                                alert("❌ Failed to save vaccination record.");
+                              }
+                            }}
+                          >
+                            <select name="vaccineId" required style={{ width: "100%", marginBottom: "8px" }}>
+                              <option value="">Select Vaccine</option>
+                              {vaccines
+                                .filter((v) => v.status !== "Given")
+                                .map((v) => (
+                                  <option key={v.id} value={v.id}>
+                                    {v.name} ({v.due_range || "N/A"})
+                                  </option>
+                                ))}
+                            </select>
+
+                            <input name="dateGiven" type="date" required style={{ width: "100%" }} />
+
+                            <button className="btn ok" style={{ marginTop: "12px", width: "100%" }}>
+                              💾 Save Vaccination
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ==================== ADD CONSULTATION MODAL ==================== */}
+                  {showConsultationModal && (
+                    <div className="modal-overlay">
+                      <div className="modal-content" style={{ maxWidth: "640px" }}>
+                        <div className="modal-header">
+                          <h2>New Consultation Note</h2>
+                          <button className="modal-close" onClick={toggleConsultationModal}>
+                            &times;
+                          </button>
+                        </div>
+
+                        <div className="modal-body">
+                          <p>
+                            For: <strong>{selectedPatient?.fullName}</strong> | Date:{" "}
+                            {new Date().toLocaleDateString("en-GB")}
+                          </p>
+
+                          <ConsultationForm
+                            patientId={selectedPatient?.id}
+                            onClose={toggleConsultationModal}
+                            onNewConsultation={(newConsultation: any) =>
+                              setConsultations((prev) => [...prev, newConsultation])
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ==================== VACCINATIONS TAB ==================== */}
+                  {activeTab === "vaccinations" && (
+                    <div>
+                      {/* --- Header --- */}
+                      <div
+                        className="flex-between"
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <h3>Vaccination Status</h3>
+
+                        <div style={{ display: "flex", gap: "8px" }}>
+
+
+                          <button
+                            className="btn ok"
+                            onClick={() => setShowVaccineModal(true)}
+                          >
+                            ＋ Add Vaccination
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* --- Vaccination Table --- */}
+                       <table className="table"  style={{ marginTop: "12px" }}>
+                        <thead>
+                          <tr>
+                            <th>Vaccine</th>
+                            <th>Due Range</th>
+                            <th>Status</th>
+                            <th>Date Given</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {vaccines.length > 0 ? (
+                            vaccines.map((v) => (
+                              <tr key={v.id}>
+                                <td>{v.name}</td>
+                                <td>{v.due_range || "—"}</td>
+                                <td>
+                                  <span
+                                    className={`badge ${
+                                      v.status === "Given"
+                                        ? "green"
+                                        : v.status === "Out Of Stock"
+                                          ? "gray"
+                                          : "yellow"
+                                      }`}
+                                  >
+                                    {v.status || "Pending"}
+                                  </span>
+                                </td>
+                                <td>{v.date_given ? formatDate(v.date_given) : "—"}</td>
+                                <td>
+                                  {v.status === "Given" ? (
+                                    "—"
+                                  ) : v.status === "Out Of Stock" ? (
+                                    <button disabled className="btn ghost small">
+                                      Out of Stock
+                                    </button>
+                                  ) : (
+                                    <button
+                                      className="btn ok small"
+                                      onClick={async () => {
+                                        const dateGiven = prompt(
+                                          `Enter date for ${v.name} (YYYY-MM-DD):`
+                                        );
+                                        if (!dateGiven) return;
+
+                                        try {
+                                          const res = await fetch(
+                                            `https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/vaccinations`,
+                                            {
+                                              method: "POST",
+                                              headers: { "Content-Type": "application/json" },
+                                              body: JSON.stringify({
+                                                vaccineId: v.id,
+                                                dateGiven,
+                                              }),
+                                            }
+                                          );
+
+                                          if (res.ok) {
+                                            const updated = await res.json();
+                                            setVaccines((prev) =>
+                                              prev.map((item) =>
+                                                item.id === v.id
+                                                  ? {
+                                                    ...item,
+                                                    status: "Given",
+                                                    date_given: updated.date_given,
+                                                  }
+                                                  : item
+                                              )
+                                            );
+                                            alert("✅ Vaccine marked as given!");
+                                          } else {
+                                            alert("❌ Failed to update vaccination record.");
+                                          }
+                                        } catch (err) {
+                                          console.error("Error updating vaccination:", err);
+                                          alert("Server error while updating vaccination.");
+                                        }
+                                      }}
+                                    >
+                                      Mark as Given
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={5} style={{ textAlign: "center", color: "#64748b" }}>
+                                No vaccination data available
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+
+                    </div>
+                  )}
+
+
+                  {/* =========Milestones========================= */}
+                  {activeTab === "milestones" && (
+                    <div>
+                      <div className="flex-between" style={{ display: "flex", justifyContent: "space-between" }}>
+                        <h3>Developmental Milestones</h3>
+                        <div style={{ textAlign: "right", marginTop: "12px" }}>
+                          <button
+                            className="btn ok"
+                            onClick={() => setShowMilestoneModal(true)}
+                          >
+                            ＋ Add New Milestone
+                          </button>
+                        </div>
+                      </div>
+
+                       <table className="table"  style={{ marginTop: "12px" }}>
+                        <thead>
+                          <tr>
+                            <th>Milestone</th>
+                            <th>Typical Age</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {milestones.length > 0 ? (
+                            milestones.map((m) => (
+                              <tr key={m.id}>
+                                <td style={{ fontWeight: "600" }}>{m.milestone_name}</td>
+                                <td>{m.typical_age || "—"}</td>
+                                <td>
+                                  {m.status === "Achieved" ? (
+                                    <span style={{ color: "green", fontWeight: 500 }}>
+                                      ✅ Achieved on{" "}
+                                      {m.achieved_date
+                                        ? new Date(m.achieved_date).toLocaleDateString("en-GB")
+                                        : "—"}
+                                    </span>
+                                  ) : (
+                                    <span style={{ color: "#6b7280" }}>Pending</span>
+                                  )}
+                                </td>
+                                <td>
+                                  {m.status === "Achieved" ? (
+                                    "—"
+                                  ) : (
+                                    <button
+                                      className="btn ok small"
+                                      onClick={async () => {
+                                        const dateAchieved = prompt(
+                                          `Enter date achieved for "${m.milestone_name}" (YYYY-MM-DD):`
+                                        );
+                                        if (!dateAchieved) return;
+
+                                        try {
+                                          const res = await fetch(
+                                            `https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/milestones`,
+                                            {
+                                              method: "POST", // ✅ Correct method
+                                              headers: { "Content-Type": "application/json" },
+                                              body: JSON.stringify({
+                                                milestoneId: m.id,
+                                                dateAchieved,
+                                              }),
+                                            }
+                                          );
+
+                                          if (res.ok) {
+                                            const updated = await res.json();
+                                            setMilestones((prev) =>
+                                              prev.map((item) =>
+                                                item.id === m.id
+                                                  ? {
+                                                    ...item,
+                                                    status: "Achieved",
+                                                    achieved_date: updated.achieved_date,
+                                                  }
+                                                  : item
+                                              )
+                                            );
+                                            alert("✅ Milestone marked as achieved!");
+                                          } else {
+                                            alert("❌ Failed to update milestone status.");
+                                          }
+                                        } catch (err) {
+                                          console.error("Error updating milestone:", err);
+                                          alert("Server error while updating milestone.");
+                                        }
+                                      }}
+                                    >
+                                      Mark as Achieved
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={4} style={{ textAlign: "center", color: "#6b7280" }}>
+                                No milestones yet
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+
+                      {/* ================= ADD MILESTONE MODAL ================= */}
+                      {showMilestoneModal && (
+                        <div className="modal-overlay">
+                          <div className="modal-content" style={{ maxWidth: "540px" }}>
+                            <div className="modal-header">
+                              <h2>Add New Milestone</h2>
+                              <button className="modal-close" onClick={() => setShowMilestoneModal(false)}>
+                                &times;
+                              </button>
+                            </div>
+
+                            <div className="modal-body">
+                              <form
+                                onSubmit={async (e) => {
+                                  e.preventDefault();
+                                  const form = e.currentTarget;
+                                  const data = Object.fromEntries(new FormData(form).entries());
+
+                                  try {
+                                    const res = await fetch(
+                                      `https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/patients/${selectedPatient.id}/addMilestone`,
+                                      {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                          milestone_name: data.milestone_name,
+                                          typical_age: data.typical_age,
+                                        }),
+                                      }
+                                    );
+
+                                    if (res.ok) {
+                                      const newMilestone = await res.json();
+                                      setMilestones((prev) => [...prev, newMilestone]);
+                                      form.reset();
+                                      alert("✅ Milestone added successfully!");
+                                      setShowMilestoneModal(false);
+                                    } else {
+                                      alert("❌ Failed to add milestone.");
+                                    }
+                                  } catch (err) {
+                                    console.error("Error adding milestone:", err);
+                                    alert("Server error while adding milestone.");
+                                  }
+                                }}
+                              >
+                                <div className="form-grid" style={{ display: "grid", gap: "8px" }}>
+                                  <input
+                                    name="milestone_name"
+                                    type="text"
+                                    placeholder="Milestone Name (e.g., Sits Alone)"
+                                    required
+                                  />
+                                  <select name="typical_age" required>
+                                    <option value="">Select Typical Age</option>
+                                    <option value="6-8 Weeks">6–8 Weeks</option>
+                                    <option value="2-3 Months">2–3 Months</option>
+                                    <option value="4-6 Months">4–6 Months</option>
+                                    <option value="6-8 Months">6–8 Months</option>
+                                    <option value="8-10 Months">8–10 Months</option>
+                                    <option value="10-12 Months">10–12 Months</option>
+                                    <option value="11-14 Months">11–14 Months</option>
+                                    <option value="12-16 Months">12–16 Months</option>
+                                  </select>
+                                </div>
+
+                                <button className="btn ok" style={{ marginTop: "12px", width: "100%" }}>
+                                  💾 Save Milestone
+                                </button>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ==================== LAB & IMAGING TAB ==================== */}
+                  {activeTab === "labimaging" && (
+                    <div>
+                      <h3>Lab & Imaging History</h3>
+
+                       <table className="table"  style={{ marginTop: "12px" }}>
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Test/Scan</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {labOrders.length > 0 ? (
+                            labOrders.map((lab) => (
+                              <tr key={lab.id}>
+                                <td>{formatDate(lab.order_date)}</td>
+                                <td style={{ fontWeight: 500 }}>{lab.test_name}</td>
+                                <td>
+                                  <span
+                                    style={{
+                                      background:
+                                        lab.test_type === "Imaging" ? "#e0f2fe" : "#ede9fe",
+                                      color:
+                                        lab.test_type === "Imaging" ? "#0284c7" : "#7c3aed",
+                                      padding: "4px 10px",
+                                      borderRadius: "999px",
+                                      fontSize: "13px",
+                                    }}
+                                  >
+                                    {lab.test_type}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span
+                                    className={`badge ${
+                                      lab.status === "Completed"
+                                        ? "green"
+                                        : lab.status === "In Progress"
+                                          ? "yellow"
+                                          : "gray"
+                                      }`}
+                                  >
+                                    {lab.status}
+                                  </span>
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn ghost small"
+                                    style={{
+                                      fontSize: "13px",
+                                      color: "#2563eb",
+                                      background: "#f1f5f9",
+                                      border: "1px solid #e2e8f0",
+                                      padding: "4px 10px",
+                                      borderRadius: "8px",
+                                    }}
+                                    onClick={() => alert(
+                                      `🧪 Test Details:\n\nTest: ${lab.test_name}\nType: ${lab.test_type}\nStatus: ${lab.status}\nDate: ${formatDate(lab.order_date)}`
+                                    )}
+                                  >
+                                    View
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={5} style={{ textAlign: "center", color: "#6b7280" }}>
+                                No Lab or Imaging Records
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* ==================== BILLING TAB ==================== */}
+                  {activeTab === "billing" && (
+                    <div>
+                      <h3>Billing History</h3>
+
+                       <table className="table"  style={{ marginTop: "12px" }}>
+                        <thead>
+                          <tr>
+                            <th>Invoice ID</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {invoices.length > 0 ? (
+                            invoices.map((inv) => (
+                              <tr key={inv.id}>
+                                <td>#{inv.id}</td>
+                                <td>{formatDate(inv.invoice_date)}</td>
+                                <td>₹ {inv.total_amount}</td>
+                                <td>
+                                  <span
+                                    className={`badge ${
+                                      inv.status === "Paid" ? "green" : "yellow"
+                                      }`}
+                                  >
+                                    {inv.status}
+                                  </span>
+                                </td>
+                                <td style={{ display: "flex", gap: "6px" }}>
+                                  {/* View Button */}
+                                  <button
+                                    className="btn ghost small"
+                                    style={{
+                                      fontSize: "13px",
+                                      color: "#2563eb",
+                                      background: "#f1f5f9",
+                                      border: "1px solid #e2e8f0",
+                                      padding: "4px 10px",
+                                      borderRadius: "8px",
+                                    }}
+                                    onClick={() =>
+                                      alert(
+                                        `💰 Invoice Details:\n\nInvoice ID: #${inv.id}\nDate: ${formatDate(inv.invoice_date)}\nAmount: ₹${inv.total_amount}\nStatus: ${inv.status}`
+                                      )
+                                    }
+                                  >
+                                    View
+                                  </button>
+
+                                  {/* Mark Paid Button */}
+                                  {inv.status !== "Paid" && (
+                                    <button
+                                      className="btn ok small"
+                                      onClick={async () => {
+                                        const confirmPay = confirm(
+                                          `Mark Invoice #${inv.id} as Paid?`
+                                        );
+                                        if (!confirmPay) return;
+
+                                        const res = await fetch(
+                                          `https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/invoices/${inv.id}`,
+                                          {
+                                            method: "PUT",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ status: "Paid" }),
+                                          }
+                                        );
+                                        if (res.ok) {
+                                          setInvoices((prev) =>
+                                            prev.map((i) =>
+                                              i.id === inv.id ? { ...i, status: "Paid" } : i
+                                            )
+                                          );
+                                          alert("✅ Invoice marked as Paid!");
+                                        } else {
+                                          alert("❌ Failed to update invoice status.");
+                                        }
+                                      }}
+                                    >
+                                      Mark as Paid
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={5} style={{ textAlign: "center", color: "#6b7280" }}>
+                                No invoices found
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+
             </div>
           </div>
         )}
       </main>
+
     </>
+  );
+}
+
+/* ==================== CONSULTATION FORM COMPONENT ==================== */
+function ConsultationForm({
+  patientId,
+  onClose,
+  onNewConsultation,
+}: {
+  patientId: number | undefined;
+  onClose: () => void;
+  onNewConsultation: (consultation: any) => void;
+}) {
+  const [doctors, setDoctors] = React.useState<{ id: number; name: string }[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  // Fetch doctors
+  React.useEffect(() => {
+    const loadDoctors = async () => {
+      try {
+        const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/doctors");
+        const data = await res.json();
+        setDoctors(data);
+      } catch (err) {
+        console.error("Error loading doctors:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadDoctors();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch("https://bankreconn.centralindia.cloudapp.azure.com/api/clinic/consultations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          patientId,
+          doctorId: Number(data.doctorId),
+          temperature: data.temperature || null,
+          heartRate: data.heartRate || null,
+          respRate: data.respRate || null,
+          symptoms: data.symptoms || "",
+          diagnosis: data.diagnosis || "",
+          treatmentPlan: data.treatmentPlan || "",
+          prescription: data.prescription || "",
+        }),
+      });
+
+      if (res.ok) {
+        const newConsultation = await res.json();
+        onNewConsultation(newConsultation);
+        form.reset();
+        onClose();
+      } else {
+        const errMsg = await res.json();
+        alert(errMsg.message || "Failed to save consultation.");
+      }
+    } catch (err) {
+      console.error("Error saving consultation:", err);
+      alert("Error saving consultation.");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h4>Doctor</h4>
+      {loading ? (
+        <p>Loading doctors...</p>
+      ) : (
+        <select
+          name="doctorId"
+          required
+          style={{ width: "100%", marginBottom: "12px" }}
+        >
+          <option value="">Select Doctor</option>
+          {doctors.map((doc) => (
+            <option key={doc.id} value={doc.id}>
+              Dr. {doc.name}
+            </option>
+          ))}
+        </select>
+      )}
+
+      <h4>Vitals</h4>
+      <div className="form-grid">
+        <input name="temperature" placeholder="Temperature (°F)" type="number" />
+        <input name="heartRate" placeholder="Heart Rate (bpm)" type="number" />
+        <input name="respRate" placeholder="Resp. Rate (bpm)" type="number" />
+      </div>
+
+      <h4 style={{ marginTop: "16px" }}>Notes</h4>
+      <textarea
+        name="symptoms"
+        placeholder="Symptoms / Observations"
+        rows={2}
+        style={{ width: "100%", resize: "none" }}
+      ></textarea>
+
+      <input
+        name="diagnosis"
+        placeholder="Diagnosis"
+        style={{ width: "100%", marginTop: "8px" }}
+      />
+
+      <textarea
+        name="treatmentPlan"
+        placeholder="Treatment Plan"
+        rows={2}
+        style={{ width: "100%", marginTop: "8px", resize: "none" }}
+      ></textarea>
+
+      <textarea
+        name="prescription"
+        placeholder="Prescription"
+        rows={2}
+        style={{ width: "100%", marginTop: "8px", resize: "none" }}
+      ></textarea>
+
+      <div style={{ textAlign: "right", marginTop: "16px" }}>
+        <button type="submit" className="btn ok">
+          💾 Save Consultation
+        </button>
+      </div>
+    </form>
   );
 }
