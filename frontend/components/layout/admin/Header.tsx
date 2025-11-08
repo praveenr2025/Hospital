@@ -92,18 +92,13 @@ export default function Header() {
               <span className="chevron">▼</span>
             </div>
 
-            <div
-              className={`user-profile-dropdown ${dropdownOpen ? "show" : ""}`}
-            >
-              <a href="#">View Profile</a>
-              <a href="#">Change Password</a>
+            <div className={`user-profile-dropdown ${dropdownOpen ? "show" : ""}`}>
+              <a href="#"> View Profile</a>
+              <a href="#"> Change Password</a>
               <div className="dropdown-divider"></div>
-              <button
-                onClick={handleLogout}
-                className="logout w-full text-left"
-              >
+              <a className="logout" onClick={handleLogout}>
                 Logout
-              </button>
+              </a>
             </div>
           </div>
         </div>
