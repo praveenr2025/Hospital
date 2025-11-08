@@ -35,7 +35,7 @@ export default function Header() {
 
           {/* Title */}
           <div>
-            <h1>Hospital Admin Portal</h1>
+            <h2>Hospital Admin Portal</h2>
             <div className="sub">Operations & Staff Management</div>
           </div>
 
