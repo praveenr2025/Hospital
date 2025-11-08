@@ -132,7 +132,7 @@ export default function BillingPage() {
           </div>
 
           <div className="table-wrapper">
-            <table>
+             <table className="table" className="table">
               <thead>
                 <tr>
                   <th>Invoice ID</th>
