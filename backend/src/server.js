@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 
-// Now that route files use 'export default', simple import works perfectly:
+
 import clinicRoutes from "./routes/clinicRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -12,7 +12,7 @@ const app = express();
 const PORT = 5000;
 
 
-app.use(cors({ origin: "https://bankreconn.centralindia.cloudapp.azure.com", credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 app.use(morgan("dev"));
 
