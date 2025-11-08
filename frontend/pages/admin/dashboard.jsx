@@ -2,10 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "../../components/layout/admin/Header";
-// Assuming global.css is linked in your layout, otherwise, import it here
-// import "./global.css"; 
 
-// Helper function to get a type for styling the pills from your global.css
 const getShiftType = (shiftString) => {
   if (!shiftString) return "OFF";
   const upper = shiftString.toUpperCase();
