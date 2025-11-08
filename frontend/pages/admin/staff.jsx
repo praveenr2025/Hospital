@@ -3,10 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link"; // Added for navigation
 import Header from "../../components/layout/admin/Header";
-// Assuming global.css is linked in your layout, otherwise, import it here
-// import "./global.css";
 
-// Static lists for filters, as in your original code
 const allRoles = ['Doctor', 'Nurse', 'Lab Technician', 'Receptionist', 'Admin', 'Radiologist', 'Surgeon'];
 const allDepartments = ['Pediatrics', 'Cardiology', 'Lab', 'Radiology', 'Front Desk', 'Administration', 'Orthopedics'];
 
@@ -199,7 +196,7 @@ const payload = {
           </div>
 
           <div style={{ overflowX: "auto" }}>
-            <table id="staff-table">
+             <table className="table" id="staff-table">
               <thead>
                 <tr>
                   <th>Name</th>
