@@ -84,11 +84,10 @@ header {
         width:210px; padding:10px 12px; border:1px solid var(--muted); border-radius:12px; background:#fff; color:var(--ink);
     }
     textarea{ min-height: 80px; }
-    /* Add this to your globals.css */
     .pill{padding:6px 10px; border-radius:999px; background:#eef2ff; color:#334155; font-weight:600; font-size:18px}
     .status-pill.primary {
-      background-color: var(--primary); /* Use your primary blue color */
-      color: white; /* Make text white */
+      background-color: var(--primary); 
+      color: white; 
     }
     .status-pill { padding: 4px 10px; border-radius: 999px; font-weight: 600; font-size: 14px; text-align: center; }
     .status-pill.given { background-color: var(--ok); color: white; }
@@ -221,7 +220,6 @@ nav a:hover {
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
     .form-grid .full-width { grid-column: 1 / -1; }
-        /* Roster Table Specifics */
     #roster-table {
         table-layout: fixed;
     }
@@ -236,7 +234,7 @@ nav a:hover {
     }
     
     .roster-pill {
-        background: #e0e7ff; /* Primary light (DAY) */
+        background: #e0e7ff; 
         border: 1px solid var(--primary);
         color: var(--primary-ink);
         font-weight: 600; padding: 4px 8px; border-radius: 8px; 
@@ -286,7 +284,6 @@ nav a:hover {
     .timeline-content { background: #f8fafc; border: 1px solid var(--muted); border-radius: 12px; padding: 12px; }
     .timeline-content strong { display: block; margin-bottom: 4px; color: var(--ink); }
     .timeline-content .muted { font-size: 12px; }
-/* === Inventory Page Styling === */
 
 .card-container {
   background: #fff;
@@ -338,8 +335,6 @@ nav a:hover {
 .add-btn:hover {
   background: #15803d;
 }
-
-/* === Table Styling === */
 .styled-table {
   width: 100%;
   border-collapse: collapse;
@@ -362,7 +357,6 @@ nav a:hover {
   color: #6b7280;
 }
 
-/* === Status Pills === */
 .status {
   padding: 3px 10px;
   border-radius: 20px;
@@ -385,7 +379,6 @@ nav a:hover {
   color: #991b1b;
 }
 
-/* === Pagination === */
 .pagination-controls {
   display: flex;
   align-items: center;
@@ -406,7 +399,6 @@ nav a:hover {
   background: #f3f4f6;
 }
 
-/* === Modal === */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -513,7 +505,7 @@ nav a:hover {
         .form-grid.cols-3 { grid-template-columns: 1fr; }
     }
 
-    .referrals-card {
+.referrals-card {
   border-radius: 18px;
   background: #fff;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
@@ -665,14 +657,13 @@ nav a:hover {
   text-align: right;
   margin-top: 10px;
 }
-/* === Dashboard List Styling === */
 
 .dashboard-list {
-  list-style: none; /* Removes bullet points */
+  list-style: none; 
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 10px; /* Adds space between list items */
+  gap: 10px; 
 }
 
 .dashboard-item {
@@ -707,16 +698,9 @@ nav a:hover {
   color: #64748b;
   margin-left: auto;
 }
-
-
-/* Special rule for the vaccination card (cols-1)
-  to push the reason to the far right, matching your image.
-*/
 .cols-1 .dashboard-item .item-reason {
   margin-left: auto;
 }
-/* frontend/styles/Login.module.css */
-/* Center the login card */
 .badge {
   display: inline-block;
   padding: 4px 8px;
@@ -728,26 +712,13 @@ nav a:hover {
 .badge.yellow { background-color: #facc15; color: #333; }
 .badge.gray { background-color: #9ca3af; }
 .btn.small { font-size: 12px; padding: 4px 8px; }
-/* =========================
-   GROWTH CHART TABLE STYLE
-   ========================= */
-   /* ===============================
-   CARD & PAGE STRUCTURE
-=============================== */
 .page.container {
   padding: 32px 0;
 }
-
-
-
 .card:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
 }
-
-/* ===============================
-   ROW ALIGNMENT (Filters, Header)
-=============================== */
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -764,10 +735,6 @@ nav a:hover {
   color: #0f172a;
   margin-right: auto;
 }
-
-/* ===============================
-   FILTER INPUTS
-=============================== */
 .row input[type="text"],
 .row select {
   border: 1px solid #cbd5e1;
@@ -785,10 +752,6 @@ nav a:hover {
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
-
-/* ===============================
-   TABLE STRUCTURE
-=============================== */
 .table {
   width: 100%;
   border-radius: 14px;
@@ -821,10 +784,6 @@ nav a:hover {
 .table tbody tr:hover {
   background-color: #f9fafb;
 }
-
-/* ===============================
-   STATUS PILL
-=============================== */
 .status-pill {
   display: inline-block;
   padding: 4px 10px;
@@ -844,9 +803,6 @@ nav a:hover {
   color: #475569;
 }
 
-/* ===============================
-   BUTTON STYLING
-=============================== */
 .btn {
   font-size: 13px;
   font-weight: 500;
@@ -857,9 +813,15 @@ nav a:hover {
   transition: all 0.15s ease-in-out;
 }
 
-.btn.ok {
-  background: #16a34a;
+.btn-ok {
+  background-color: #16a34a;
   color: white;
+  font-weight: 300;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .btn.ok:hover {
@@ -885,9 +847,6 @@ nav a:hover {
   background: #eff6ff;
 }
 
-/* ===============================
-   ADD BUTTON (TOP RIGHT)
-=============================== */
 .btn.right {
   margin-left: auto;
   background: #16a34a;
@@ -901,10 +860,6 @@ nav a:hover {
 .btn.right:hover {
   background: #15803d;
 }
-
-/* ===============================
-   TABLE LINKS
-=============================== */
 .table a {
   color: #2563eb;
   font-weight: 600;
@@ -914,16 +869,14 @@ nav a:hover {
 .table a:hover {
   text-decoration: underline;
 }
-
-/* === Professional "View" Link Button === */
 .link-btn {
   display: inline-block;
   padding: 6px 14px;
   font-size: 14px;
   font-weight: 600;
-  color: #2563eb; /* Primary blue */
-  background-color: #f8fafc; /* Light subtle background */
-  border: 1px solid #e2e8f0; /* Gentle border */
+  color: #2563eb; 
+  background-color: #f8fafc; 
+  border: 1px solid #e2e8f0; 
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -933,7 +886,7 @@ nav a:hover {
 }
 
 .link-btn:hover {
-  background-color: #eff6ff; /* Lighter blue hover */
+  background-color: #eff6ff; 
   border-color: #bfdbfe;
   color: #1d4ed8;
   transform: translateY(-1px);
@@ -949,22 +902,10 @@ nav a:hover {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
-/* =============================
-   Appointment Modal Overlay
-   Namespace: appt-modal-
-   ============================= */
-/* =====================================================
-   UNIVERSAL MODAL SYSTEM — applies to all modals
-   (Consultation, Appointment, Growth, Vaccine, Milestone)
-   ===================================================== */
-
-/* ==================== MODAL CSS (UNIFIED) ==================== */
-/* === Overlay with blur === */
 .uni-modal-overlay {
 position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(4px); z-index: 99;
 }
 
-/* === Modal container === */
 .uni-modal-content {
   background: #ffffff;
   border-radius: 16px;
@@ -976,7 +917,6 @@ position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: b
   animation: uniSlideUp 0.3s ease-in-out;
 }
 
-/* === Modal Header === */
 .uni-modal-header {
   display: flex;
   justify-content: space-between;
@@ -1004,7 +944,6 @@ position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: b
   color: #dc2626;
 }
 
-/* === Modal Body === */
 .uni-modal-body {
   max-height: 70vh;
   overflow-y: auto;
@@ -1012,14 +951,12 @@ position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: b
   scrollbar-width: thin;
 }
 
-/* === Modal Footer === */
 .uni-modal-footer {
   margin-top: 24px;
   display: flex;
   justify-content: flex-end;
 }
 
-/* === Form Elements === */
 .uni-modal-content input,
 .uni-modal-content select,
 .uni-modal-content textarea {
@@ -1042,7 +979,6 @@ position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: b
   background: #fff;
 }
 
-/* === Primary Action Button (btn-ok is used in the forms now) === */
 .uni-modal-content .btn-ok {
   background-color: #16a34a;
   color: white;
@@ -1058,7 +994,6 @@ position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: b
   background-color: #15803d;
 }
 
-/* === Secondary Ghost Button (optional) */
 .uni-modal-content .btn-ghost {
   background: #f1f5f9;
   color: #334155;
@@ -1073,7 +1008,6 @@ position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: b
   background: #e2e8f0;
 }
 
-/* === Time Slot Buttons (for appointment-like modals) */
 .uni-timeslot {
   display: inline-block;
   border: 1px solid #e2e8f0;
@@ -1099,7 +1033,7 @@ position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: b
   border-color: #3b82f6;
 }
 
-/* === Animations === */
+
 @keyframes uniFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1116,7 +1050,6 @@ position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: b
   }
 }
 
-/* === Responsive (Mobile View) === */
 @media (max-width: 640px) {
   .uni-modal-content {
     width: 92%;
