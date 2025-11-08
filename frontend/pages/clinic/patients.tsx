@@ -193,9 +193,9 @@ export default function PatientsPage() {
       <main className="body">
         {/* ================= ADD PATIENT MODAL ================= */}
           {modalOpen && (
-            <div className="uni-modal-overlay">
-              <div className="uni-modal-content">
-                <div className="uni-modal-header">
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <div className="modal-header">
                   <h2>Register New Patient</h2>
                   <button
                     className="uni-modal-close"
