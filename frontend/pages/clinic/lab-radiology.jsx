@@ -94,7 +94,7 @@ export default function LabRadiologyPage() {
           </div>
 
           <div className="table-wrapper">
-            <table className="styled-table">
+             <table className="table" className="table">
               <thead>
                 <tr>
                   <th>Order ID</th>
