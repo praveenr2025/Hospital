@@ -156,7 +156,7 @@ export default function UsersPage() {
           </div>
 
           <div style={{ overflowX: "auto" }}>
-            <table id="user-table">
+             <table className="table" id="user-table">
               <thead>
                 <tr>
                   <th>Staff Member</th>
