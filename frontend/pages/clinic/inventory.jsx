@@ -95,7 +95,7 @@ export default function InventoryPage() {
       <main className="body">
         {/* Inventory Management Card */}
         <div className="card-container"
-        style={{ maxWidth: "1280px", margin: "16px auto" }}
+        style={{ maxWidth: "1580px", margin: "16px auto" }}
         >
           <div className="card-header">
             <h2>Vaccine Inventory Management</h2>
@@ -117,7 +117,7 @@ export default function InventoryPage() {
             ) : error ? (
               <p className="error-text">{error}</p>
             ) : (
-              <table className="styled-table">
+               <table className="table" className="table">
                 <thead>
                   <tr>
                     <th>Vaccine</th>
