@@ -219,7 +219,7 @@ export default function RosterPage() {
           </div>
 
           <div style={{ overflowX: "auto" }}>
-            <table id="roster-table">
+              <table className="table" className="table" id="roster-table">
               <thead>
                 <tr>
                   <th>Staff Member</th>
