@@ -193,12 +193,12 @@ export default function PatientsPage() {
       <main className="body">
         {/* ================= ADD PATIENT MODAL ================= */}
           {modalOpen && (
-            <div className="appt-modal-overlay">
-              <div className="appt-modal-content">
-                <div className="appt-modal-header">
+            <div className="uni-modal-overlay">
+              <div className="uni-modal-content">
+                <div className="uni-modal-header">
                   <h2>Register New Patient</h2>
                   <button
-                    className="appt-modal-close"
+                    className="uni-modal-close"
                     onClick={() => setModalOpen(false)}
                     aria-label="Close"
                   >
@@ -206,7 +206,7 @@ export default function PatientsPage() {
                   </button>
                 </div>
 
-                <div className="appt-modal-body">
+                <div className="uni-modal-body">
                   <form
                     onSubmit={async (e) => {
                       e.preventDefault();
@@ -293,8 +293,8 @@ export default function PatientsPage() {
                       </div>
                     </section>
 
-                    <div className="modal-footer">
-                      <button type="submit" className="btn ok">
+                    <div className="uni-modal-footer">
+                      <button type="submit" className="btn-ok">
                         Save Patient Record
                       </button>
                     </div>
@@ -373,8 +373,8 @@ export default function PatientsPage() {
                   </tbody>
               </table>
                       )}
-                    </div>
-                  )}
+            </div>
+                      )}
 
         {/* ==================== PATIENT DETAILS (COMBINED INTO MAIN COMPONENT) ==================== */}
         {selectedPatient && (
@@ -385,7 +385,7 @@ export default function PatientsPage() {
 
             <div className="grid">
               {/* LEFT PANEL */}
-              <div className="cols-1">
+              <div className="cols-1">        
                 <div className="card">
                   <h2>{selectedPatient.fullName}</h2>
                   <p>
@@ -414,7 +414,7 @@ export default function PatientsPage() {
                   <h4>Growth Chart</h4>
 
                   {/* --- Table --- */}
-                   <table className="table">
+                    <table className="table">
                     <thead>
                       <tr>
                         <th>Date</th>
@@ -663,16 +663,16 @@ export default function PatientsPage() {
 
                   {/* ================= ADD GROWTH MODAL ================= */}
                   {showGrowthModal && (
-                    <div className="appt-modal-overlay">
-                      <div className="appt-modal-content" style={{ maxWidth: "540px" }}>
-                        <div className="appt-modal-header">
+                    <div className="uni-modal-overlay">
+                      <div className="uni-modal-content" style={{ maxWidth: "540px" }}>
+                        <div className="uni-modal-header">
                           <h2>Add Growth Record</h2>
-                          <button className="appt-modal-close" onClick={() => setShowGrowthModal(false)}>
+                          <button className="uni-modal-close" onClick={() => setShowGrowthModal(false)}>
                             &times;
                           </button>
                         </div>
 
-                        <div className="appt-modal-body">
+                        <div className="uni-modal-body">
                           <form
                             onSubmit={async (e) => {
                               e.preventDefault();
@@ -723,7 +723,7 @@ export default function PatientsPage() {
                               />
                             </div>
 
-                            <button className="btn ok" style={{ marginTop: "12px", width: "100%" }}>
+                            <button className="btn-ok" style={{ marginTop: "12px", width: "100%" }}>
                               💾 Save Record
                             </button>
                           </form>
@@ -734,16 +734,16 @@ export default function PatientsPage() {
 
                   {/* ================= ADD VACCINATION MODAL ================= */}
                   {showVaccineModal && (
-                    <div className="appt-modal-overlay">
-                      <div className="appt-modal-content" style={{ maxWidth: "540px" }}>
-                        <div className="appt-modal-header">
+                    <div className="uni-modal-overlay">
+                      <div className="uni-modal-content" style={{ maxWidth: "540px" }}>
+                        <div className="uni-modal-header">
                           <h2>Add Vaccination</h2>
-                          <button className="appt-modal-close" onClick={() => setShowVaccineModal(false)}>
+                          <button className="uni-modal-close" onClick={() => setShowVaccineModal(false)}>
                             &times;
                           </button>
                         </div>
 
-                        <div className="appt-modal-body">
+                        <div className="uni-modal-body">
                           <form
                             onSubmit={async (e) => {
                               e.preventDefault();
@@ -792,7 +792,7 @@ export default function PatientsPage() {
 
                             <input name="dateGiven" type="date" required style={{ width: "100%" }} />
 
-                            <button className="btn ok" style={{ marginTop: "12px", width: "100%" }}>
+                            <button className="btn-ok" style={{ marginTop: "12px", width: "100%" }}>
                               💾 Save Vaccination
                             </button>
                           </form>
@@ -803,16 +803,16 @@ export default function PatientsPage() {
 
                   {/* ==================== ADD CONSULTATION MODAL ==================== */}
                   {showConsultationModal && (
-                    <div className="appt-modal-overlay">
-                      <div className="appt-modal-content" style={{ maxWidth: "640px" }}>
-                        <div className="appt-modal-header">
+                    <div className="uni-modal-overlay">
+                      <div className="uni-modal-content" style={{ maxWidth: "640px" }}>
+                        <div className="uni-modal-header">
                           <h2>New Consultation Note</h2>
-                          <button className="appt-modal-close" onClick={toggleConsultationModal}>
+                          <button className="uni-modal-close" onClick={toggleConsultationModal}>
                             &times;
                           </button>
                         </div>
 
-                        <div className="appt-modal-body">
+                        <div className="uni-modal-body">
                           <p>
                             For: <strong>{selectedPatient?.fullName}</strong> | Date:{" "}
                             {new Date().toLocaleDateString("en-GB")}
@@ -876,11 +876,11 @@ export default function PatientsPage() {
                                 <td>
                                   <span
                                     className={`badge ${
-                                      v.status === "Given"
-                                        ? "green"
-                                        : v.status === "Out Of Stock"
-                                          ? "gray"
-                                          : "yellow"
+                                        v.status === "Given"
+                                          ? "green"
+                                          : v.status === "Out Of Stock"
+                                            ? "gray"
+                                            : "yellow"
                                       }`}
                                   >
                                     {v.status || "Pending"}
@@ -922,10 +922,10 @@ export default function PatientsPage() {
                                               prev.map((item) =>
                                                 item.id === v.id
                                                   ? {
-                                                    ...item,
-                                                    status: "Given",
-                                                    date_given: updated.date_given,
-                                                  }
+                                                      ...item,
+                                                      status: "Given",
+                                                      date_given: updated.date_given,
+                                                    }
                                                   : item
                                               )
                                             );
@@ -1032,10 +1032,10 @@ export default function PatientsPage() {
                                               prev.map((item) =>
                                                 item.id === m.id
                                                   ? {
-                                                    ...item,
-                                                    status: "Achieved",
-                                                    achieved_date: updated.achieved_date,
-                                                  }
+                                                      ...item,
+                                                      status: "Achieved",
+                                                      achieved_date: updated.achieved_date,
+                                                    }
                                                   : item
                                               )
                                             );
@@ -1067,16 +1067,16 @@ export default function PatientsPage() {
 
                       {/* ================= ADD MILESTONE MODAL ================= */}
                       {showMilestoneModal && (
-                        <div className="appt-modal-overlay">
-                          <div className="appt-modal-content" style={{ maxWidth: "540px" }}>
-                            <div className="appt-modal-header">
+                        <div className="uni-modal-overlay">
+                          <div className="uni-modal-content" style={{ maxWidth: "540px" }}>
+                            <div className="uni-modal-header">
                               <h2>Add New Milestone</h2>
-                              <button className="appt-modal-close" onClick={() => setShowMilestoneModal(false)}>
+                              <button className="uni-modal-close" onClick={() => setShowMilestoneModal(false)}>
                                 &times;
                               </button>
                             </div>
 
-                            <div className="appt-modal-body">
+                            <div className="uni-modal-body">
                               <form
                                 onSubmit={async (e) => {
                                   e.preventDefault();
@@ -1131,7 +1131,7 @@ export default function PatientsPage() {
                                   </select>
                                 </div>
 
-                                <button className="btn ok" style={{ marginTop: "12px", width: "100%" }}>
+                                <button className="btn-ok" style={{ marginTop: "12px", width: "100%" }}>
                                   💾 Save Milestone
                                 </button>
                               </form>
@@ -1181,11 +1181,11 @@ export default function PatientsPage() {
                                 <td>
                                   <span
                                     className={`badge ${
-                                      lab.status === "Completed"
-                                        ? "green"
-                                        : lab.status === "In Progress"
-                                          ? "yellow"
-                                          : "gray"
+                                        lab.status === "Completed"
+                                          ? "green"
+                                          : lab.status === "In Progress"
+                                            ? "yellow"
+                                            : "gray"
                                       }`}
                                   >
                                     {lab.status}
@@ -1193,7 +1193,7 @@ export default function PatientsPage() {
                                 </td>
                                 <td>
                                   <button
-                                    className="btn ghost small"
+                                    className="btn-ghost"
                                     style={{
                                       fontSize: "13px",
                                       color: "#2563eb",
@@ -1248,8 +1248,8 @@ export default function PatientsPage() {
                                 <td>
                                   <span
                                     className={`badge ${
-                                      inv.status === "Paid" ? "green" : "yellow"
-                                      }`}
+                                        inv.status === "Paid" ? "green" : "yellow"
+                                        }`}
                                   >
                                     {inv.status}
                                   </span>
@@ -1257,7 +1257,7 @@ export default function PatientsPage() {
                                 <td style={{ display: "flex", gap: "6px" }}>
                                   {/* View Button */}
                                   <button
-                                    className="btn ghost small"
+                                    className="btn-ghost"
                                     style={{
                                       fontSize: "13px",
                                       color: "#2563eb",
@@ -1278,7 +1278,7 @@ export default function PatientsPage() {
                                   {/* Mark Paid Button */}
                                   {inv.status !== "Paid" && (
                                     <button
-                                      className="btn ok small"
+                                      className="btn-ok small"
                                       onClick={async () => {
                                         const confirmPay = confirm(
                                           `Mark Invoice #${inv.id} as Paid?`
@@ -1457,8 +1457,8 @@ function ConsultationForm({
         style={{ width: "100%", marginTop: "8px", resize: "none" }}
       ></textarea>
 
-      <div style={{ textAlign: "right", marginTop: "16px" }}>
-        <button type="submit" className="btn ok">
+      <div className="uni-modal-footer">
+        <button type="submit" className="btn-ok">
           💾 Save Consultation
         </button>
       </div>
