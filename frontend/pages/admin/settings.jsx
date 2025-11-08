@@ -154,7 +154,7 @@ export default function SettingsPage() {
                 </button>
               </div>
               <div style={{ overflowX: "auto" }}>
-                <table id="billing-codes-table">
+                 <table className="table" className="table" id="billing-codes-table">
                   <thead>
                     <tr>
                       <th>Code</th>
@@ -192,7 +192,7 @@ export default function SettingsPage() {
                 </button>
               </div>
               <div style={{ overflowX: "auto" }}>
-                <table id="lab-tests-table">
+                 <table className="table" id="lab-tests-table">
                   <thead>
                     <tr>
                       <th>Test Name</th>
