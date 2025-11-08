@@ -172,7 +172,7 @@ export default function StaffProfilePage() {
             {/* Weekly Roster */}
             <div className="card" style={{ marginTop: 24 }}>
               <h4>This Week's Roster</h4>
-              <table id="profile-roster-table" style={{ width: '100%' }}>
+               <table className="table" id="profile-roster-table" style={{ width: '100%' }}>
                 <thead>
                   <tr>
                     <th>Day</th>
@@ -261,14 +261,7 @@ export default function StaffProfilePage() {
                 ) : (
                   <p className="muted" style={{ padding: '0 20px' }}>No activity notes yet.</p>
                 )}
-                {/* --- Example of other items from your design --- */}
-                {/* <li className="timeline-item">
-                  <div className="timeline-icon accent">🩺</div>
-                  <div className="timeline-content">
-                    <strong>Appointment - 13 Oct 2025</strong>
-                    <p style={{ margin: 0, color: 'var(--ink-soft)' }}>Appointment Scheduled: 5-week checkup for Zoya Khan</p>
-                  </div>
-                </li> */}
+
               </ul>
 
             </div>
