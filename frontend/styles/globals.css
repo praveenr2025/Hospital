@@ -953,47 +953,45 @@ nav a:hover {
    Appointment Modal Overlay
    Namespace: appt-modal-
    ============================= */
+/* =====================================================
+   UNIVERSAL MODAL SYSTEM — applies to all modals
+   (Consultation, Appointment, Growth, Vaccine, Milestone)
+   ===================================================== */
 
-/* Background overlay with blur */
-.appt-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.35); /* subtle slate overlay */
-  backdrop-filter: blur(8px); /* smooth blur effect */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 5000;
-  animation: apptFadeIn 0.3s ease-in-out;
+/* ==================== MODAL CSS (UNIFIED) ==================== */
+/* === Overlay with blur === */
+.uni-modal-overlay {
+position: fixed; inset: 0; background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(4px); z-index: 99;
 }
 
-/* Modal container */
-.appt-modal-content {
+/* === Modal container === */
+.uni-modal-content {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.15);
   width: 100%;
   max-width: 720px;
   padding: 28px 32px;
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.15);
   position: relative;
-  animation: apptSlideUp 0.3s ease-in-out;
+  animation: uniSlideUp 0.3s ease-in-out;
 }
 
-/* Header */
-.appt-modal-header {
+/* === Modal Header === */
+.uni-modal-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 18px;
 }
 
-.appt-modal-header h2 {
+.uni-modal-header h2 {
   font-size: 20px;
   font-weight: 600;
   color: #0f172a;
+  margin: 0;
 }
 
-.appt-modal-close {
+.uni-modal-close {
   border: none;
   background: transparent;
   font-size: 22px;
@@ -1002,47 +1000,50 @@ nav a:hover {
   transition: color 0.2s ease;
 }
 
-.appt-modal-close:hover {
+.uni-modal-close:hover {
   color: #dc2626;
 }
 
-/* Body section */
-.appt-modal-body {
+/* === Modal Body === */
+.uni-modal-body {
   max-height: 70vh;
   overflow-y: auto;
   padding-right: 4px;
+  scrollbar-width: thin;
 }
 
-/* Footer section */
-.appt-modal-footer {
+/* === Modal Footer === */
+.uni-modal-footer {
   margin-top: 24px;
   display: flex;
   justify-content: flex-end;
 }
 
-/* Inputs and Selects */
-.appt-modal-content input,
-.appt-modal-content select,
-.appt-modal-content textarea {
+/* === Form Elements === */
+.uni-modal-content input,
+.uni-modal-content select,
+.uni-modal-content textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
   color: #0f172a;
+  background: #f8fafc;
   transition: border 0.2s ease, box-shadow 0.2s ease;
   outline: none;
 }
 
-.appt-modal-content input:focus,
-.appt-modal-content select:focus,
-.appt-modal-content textarea:focus {
+.uni-modal-content input:focus,
+.uni-modal-content select:focus,
+.uni-modal-content textarea:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  background: #fff;
 }
 
-/* Action button */
-.appt-modal-content .btn-ok {
+/* === Primary Action Button (btn-ok is used in the forms now) === */
+.uni-modal-content .btn-ok {
   background-color: #16a34a;
   color: white;
   font-weight: 600;
@@ -1053,12 +1054,27 @@ nav a:hover {
   transition: background-color 0.2s ease;
 }
 
-.appt-modal-content .btn-ok:hover {
+.uni-modal-content .btn-ok:hover {
   background-color: #15803d;
 }
 
-/* Time slot buttons */
-.appt-timeslot {
+/* === Secondary Ghost Button (optional) */
+.uni-modal-content .btn-ghost {
+  background: #f1f5f9;
+  color: #334155;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.uni-modal-content .btn-ghost:hover {
+  background: #e2e8f0;
+}
+
+/* === Time Slot Buttons (for appointment-like modals) */
+.uni-timeslot {
   display: inline-block;
   border: 1px solid #e2e8f0;
   padding: 8px 12px;
@@ -1071,27 +1087,25 @@ nav a:hover {
   transition: all 0.2s ease-in-out;
 }
 
-.appt-timeslot:hover {
+.uni-timeslot:hover {
   background: #e0f2fe;
   color: #0369a1;
   border-color: #bae6fd;
 }
 
-.appt-timeslot.selected {
+.uni-timeslot.selected {
   background: #3b82f6;
   color: white;
   border-color: #3b82f6;
 }
 
-/* =============================
-   Animations
-   ============================= */
-@keyframes apptFadeIn {
+/* === Animations === */
+@keyframes uniFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes apptSlideUp {
+@keyframes uniSlideUp {
   from {
     transform: translateY(25px);
     opacity: 0;
@@ -1102,9 +1116,9 @@ nav a:hover {
   }
 }
 
-/* Responsive design */
+/* === Responsive (Mobile View) === */
 @media (max-width: 640px) {
-  .appt-modal-content {
+  .uni-modal-content {
     width: 92%;
     padding: 20px;
     border-radius: 12px;
