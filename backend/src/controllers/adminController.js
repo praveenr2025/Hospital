@@ -11,9 +11,8 @@ export const getAllStaff = async (req, res) => {
   }
 };
 
-// Create a new staff
 export const createStaff = async (req, res) => {
-  // Use 'status' from req.body, not loginStatus
+  
   const { fullName, role, department, contact, email, password, securityRole, status } = req.body;
 
   if (!fullName || !role) {
@@ -102,7 +101,7 @@ export const getStaffById = async (req, res) => {
 
 // Get all notes for a specific staff member
 export const getStaffNotes = async (req, res) => {
-  const { id } = req.params; // This is staff_id
+  const { id } = req.params; 
   try {
     // Assumes your notes table is 'staff_notes' and has a 'staff_id' column
     const result = await pool.query(
