@@ -63,7 +63,7 @@ type Tab =
   | "consultations"
   | "vaccinations"
   | "milestones"
-  | "labimaging"
+  | "lab & Imaging"
   | "billing";
 
 // ==================== Helper ====================
@@ -455,7 +455,7 @@ export default function PatientsPage() {
               <div className="cols-2">
                 <div className="card">
                   <div className="tabs">
-                    {["fullhistory", "consultations", "vaccinations", "milestones", "labimaging", "billing"].map(
+                    {["fullhistory", "consultations", "vaccinations", "milestones", "lab & Imaging", "billing"].map(
                       (t) => (
                         <div
                           key={t}
@@ -896,7 +896,7 @@ export default function PatientsPage() {
                                     </button>
                                   ) : (
                                     <button
-                                      className="btn ok small"
+                                      className="btn ok"
                                       onClick={async () => {
                                         const dateGiven = prompt(
                                           `Enter date for ${v.name} (YYYY-MM-DD):`
@@ -1006,7 +1006,7 @@ export default function PatientsPage() {
                                     "—"
                                   ) : (
                                     <button
-                                      className="btn ok small"
+                                      className="btn ok"
                                       onClick={async () => {
                                         const dateAchieved = prompt(
                                           `Enter date achieved for "${m.milestone_name}" (YYYY-MM-DD):`
@@ -1143,7 +1143,7 @@ export default function PatientsPage() {
                   )}
 
                   {/* ==================== LAB & IMAGING TAB ==================== */}
-                  {activeTab === "labimaging" && (
+                  {activeTab === "lab & Imaging" && (
                     <div>
                       <h3>Lab & Imaging History</h3>
 
@@ -1278,7 +1278,7 @@ export default function PatientsPage() {
                                   {/* Mark Paid Button */}
                                   {inv.status !== "Paid" && (
                                     <button
-                                      className="btn-ok small"
+                                      className="btn-ok"
                                       onClick={async () => {
                                         const confirmPay = confirm(
                                           `Mark Invoice #${inv.id} as Paid?`
